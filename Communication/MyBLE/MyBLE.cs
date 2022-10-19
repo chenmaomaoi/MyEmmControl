@@ -53,6 +53,10 @@ namespace MyEmmControl.Communication
         /// 周围设备
         /// </summary>
         public List<DeviceInformation> DevicesInformation { get; set; } = new List<DeviceInformation>();
+
+        public string ServiceGuid { get; private set; }
+        public string WriteCharacteristicGuid { get; private set; }
+        public string NotifyCharacteristicGuid { get; private set; }
         #endregion
 
         #region 事件
@@ -86,21 +90,16 @@ namespace MyEmmControl.Communication
             };
         #endregion
 
-        #region 私有属性
-        private string serviceGuid { get; set; }
-        private string writeCharacteristicGuid { get; set; }
-        private string notifyCharacteristicGuid { get; set; }
         private DeviceWatcher watcher { get; set; }
-        #endregion
 
         #region 公开方法
         public MyBLE(string serviceGuid = "0000ffe0-0000-1000-8000-00805f9b34fb",
                      string writeCharacteristicGuid = "0000ffe1-0000-1000-8000-00805f9b34fb",
                      string notifyCharacteristicGuid = "0000ffe1-0000-1000-8000-00805f9b34fb")
         {
-            this.serviceGuid = serviceGuid;
-            this.writeCharacteristicGuid = writeCharacteristicGuid;
-            this.notifyCharacteristicGuid = notifyCharacteristicGuid;
+            this.ServiceGuid = serviceGuid;
+            this.WriteCharacteristicGuid = writeCharacteristicGuid;
+            this.NotifyCharacteristicGuid = notifyCharacteristicGuid;
 
             watcher = DeviceInformation.CreateWatcher(AQS_ALL_BLUETOOTHLE_DEVICES,
                                                       REQUESTED_PROPERTIES,
@@ -158,6 +157,12 @@ namespace MyEmmControl.Communication
                 Task.Run(() => CurrentWriteCharacteristic.WriteValueAsync(CryptographicBuffer.CreateFromByteArray(data),
                                                                           GattWriteOption.WriteWithResponse));
             }
+        }
+
+        public bool? ConnectDeviceAndSettingWindow()
+        {
+            //todo:设置与连接
+            throw new NotImplementedException();
         }
         #endregion
 
@@ -235,7 +240,7 @@ namespace MyEmmControl.Communication
         {
             RetStatus retStatus = new RetStatus();
 
-            Guid guid = new Guid(serviceGuid);
+            Guid guid = new Guid(ServiceGuid);
             try
             {
                 CurrentService = (await CurrentDevice.GetGattServicesForUuidAsync(guid)).Services[CHARACTERISTIC_INDEX];
@@ -256,8 +261,8 @@ namespace MyEmmControl.Communication
         private async Task<RetStatus> getCurrentCharacteristic()
         {
             RetStatus retStatus = new RetStatus();
-            Guid writeGuid = new Guid(writeCharacteristicGuid);
-            Guid notifyGuid = new Guid(notifyCharacteristicGuid);
+            Guid writeGuid = new Guid(WriteCharacteristicGuid);
+            Guid notifyGuid = new Guid(NotifyCharacteristicGuid);
 
             GattCharacteristicsResult writeCharacteristic = await CurrentService.GetCharacteristicsForUuidAsync(writeGuid);
             GattCharacteristicsResult notifyCharacteristic = await CurrentService.GetCharacteristicsForUuidAsync(notifyGuid);

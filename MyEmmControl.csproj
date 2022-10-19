@@ -59,6 +59,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Page Include="Communication\MyBLE\MyBLE_ConnectDeviceAndSettingWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -67,8 +71,11 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Communication\MyBLE.cs" />
+    <Compile Include="Communication\MyBLE\MyBLE.cs" />
     <Compile Include="Communication\ICommunication.cs" />
+    <Compile Include="Communication\MyBLE\MyBLE_ConnectDeviceAndSettingWindow.xaml.cs">
+      <DependentUpon>MyBLE_ConnectDeviceAndSettingWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Communication\MyXbox\Button.cs" />
     <Compile Include="Communication\MyXbox\FilterKalman.cs" />
     <Compile Include="Communication\MyXbox\StickValue.cs" />

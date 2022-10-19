@@ -56,7 +56,7 @@ namespace MyEmmControl
             Task.Run(() => 
             {
                 double add = 100 / 30;
-                for (int i = 0; i < 30; i++)
+                for (int i = 0; i < 32; i++)
                 {
                     Dispatcher.Invoke(() => progress_Discover.Value += add);
                     Thread.Sleep(1000);
