@@ -1,8 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using MyBLE;
+using MyEmmControl.Communication;
+using SharpDX.Text;
 using Windows.Devices.Enumeration;
 
 namespace MyEmmControl
@@ -12,32 +16,18 @@ namespace MyEmmControl
     /// </summary>
     public partial class MainWindow : Window
     {
-        private BLE ble;
+        private MyBLE ble;
         public MainWindow()
         {
             InitializeComponent();
-            ble = new BLE();
+            ble = new MyBLE();
             ble.DiscoverDevicesComplete += this.Ble_DiscoverDevicesComplete;
-
+            ble.OnRecvdData += Ble_RecvdData;
         }
 
-        private void Ble_DiscoveredDevice(DeviceWatcher sender, DeviceInformation args)
+        private void Ble_RecvdData(object sender, byte[] args)
         {
-            list_DiscoveredDevices.Dispatcher.BeginInvoke(new Action(() =>
-            {
-                string[] s = new string[2];
-                s[0] = args.Name;
-                s[1] = args.Id.Split('-')[1];
-                list_DiscoveredDevices.Items.Add(args.Id.Split('-')[1]);
-            }));
-        }
-
-        private void Ble_DeviceInformationUpdate(DeviceWatcher sender, DeviceInformationUpdate args)
-        {
-            list_DiscoveredDevices.Dispatcher.BeginInvoke(new Action(() =>
-            {
-                list_DiscoveredDevices.Items.Add(args.Id.Split('-')[1]);
-            }));
+            Dispatcher.Invoke(() => lab_Status.Content = Encoding.Default.GetString(args));
         }
 
         private void Ble_DiscoverDevicesComplete(object sender, List<DeviceInformation> e)
@@ -53,22 +43,42 @@ namespace MyEmmControl
 
                     list_DiscoveredDevices.Items.Add(name);
 
-
                     Console.WriteLine(name);
                 }
+                progress_Discover.Value = 0;
             });
         }
 
         private void btn_Connect_Click(object sender, RoutedEventArgs e)
         {
             ble.DiscoverDevices();
+
+            Task.Run(() => 
+            {
+                double add = 100 / 30;
+                for (int i = 0; i < 30; i++)
+                {
+                    Dispatcher.Invoke(() => progress_Discover.Value += add);
+                    Thread.Sleep(1000);
+                }
+            });
         }
 
-        private void Item_MouseDoubleClick(object sender, RoutedEventArgs e)
+        private async void Item_MouseDoubleClick(object sender, RoutedEventArgs e)
         {
-            var v = sender as ListViewItem;
+            ListViewItem v = sender as ListViewItem;
             Console.WriteLine(v.DataContext);
-        }
 
+            lab_Status.Content = "连接中..." + v.DataContext;
+            string id = v.DataContext.ToString();
+            if (id.Contains('-'))
+            {
+                id = id.Split('-')[1];
+            }
+
+            RetStatus ret = await ble.ConnectDevice(id);
+            lab_Status.Content = ret.status + "-" + ret.message;
+
+        }
     }
 }
