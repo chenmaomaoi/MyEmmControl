@@ -40,7 +40,7 @@ namespace MyEmmControl
             Type type = Type.GetType(prefix + typeName);
             ICommunication communication = (ICommunication)Activator.CreateInstance(type);
 
-            bool res = (bool)communication.ConnectDeviceAndSettingWindow();
+            bool res = (bool)communication.ConnectDeviceAndSettingWindow(this);
             if (res)
             {
                 //todo:已连接，进入主控制页面

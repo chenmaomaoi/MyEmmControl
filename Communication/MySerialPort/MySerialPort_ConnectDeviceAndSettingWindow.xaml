@@ -7,7 +7,8 @@
         mc:Ignorable="d"
         Title="串口设置"
         Height="230"
-        Width="300">
+        Width="300"
+        WindowStartupLocation="CenterOwner">
     <Grid>
         <Grid Margin="10">
             <Grid.RowDefinitions>

@@ -4,6 +4,7 @@ using System.IO.Ports;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace MyEmmControl.Communication
 {
@@ -28,7 +29,12 @@ namespace MyEmmControl.Communication
             OnRecvdData?.Invoke(sender, result);
         }
 
-        public bool? ConnectDeviceAndSettingWindow() => new MySerialPort_ConnectDeviceAndSettingWindow(this).ShowDialog();
+        public bool? ConnectDeviceAndSettingWindow(Window owner)
+        {
+            var dia =new MySerialPort_ConnectDeviceAndSettingWindow(this);
+            dia.Owner = owner;
+            return dia.ShowDialog();
+        }
 
         public void Dispose()
         {

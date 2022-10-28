@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Windows;
 
 namespace MyEmmControl.Communication
 {
@@ -19,7 +20,7 @@ namespace MyEmmControl.Communication
         /// 连接设备与设置
         /// </summary>
         /// <returns></returns>
-        bool? ConnectDeviceAndSettingWindow();
+        bool? ConnectDeviceAndSettingWindow(Window owner);
 
         /// <summary>
         /// 收到数据

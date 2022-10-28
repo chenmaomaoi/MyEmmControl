@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using System.Windows;
 using Windows.Devices.Bluetooth;
 using Windows.Devices.Bluetooth.GenericAttributeProfile;
 using Windows.Devices.Enumeration;
@@ -172,10 +173,12 @@ namespace MyEmmControl.Communication
             }
         }
 
-        public bool? ConnectDeviceAndSettingWindow()
+        public bool? ConnectDeviceAndSettingWindow(Window owner)
         {
             //设置与连接
-            return new MyBLE_ConnectDeviceAndSettingWindow(this).ShowDialog();
+            var dia = new MyBLE_ConnectDeviceAndSettingWindow(this);
+            dia.Owner = owner;
+            return dia.ShowDialog();
         }
         #endregion
 
