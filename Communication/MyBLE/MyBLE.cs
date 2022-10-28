@@ -108,6 +108,19 @@ namespace MyEmmControl.Communication
             watcher.EnumerationCompleted += watcher_EnumerationCompleted;
         }
 
+        public MyBLE()
+        {
+            this.ServiceGuid = "0000ffe0-0000-1000-8000-00805f9b34fb";
+            this.WriteCharacteristicGuid = "0000ffe1-0000-1000-8000-00805f9b34fb";
+            this.NotifyCharacteristicGuid = "0000ffe1-0000-1000-8000-00805f9b34fb";
+
+            watcher = DeviceInformation.CreateWatcher(AQS_ALL_BLUETOOTHLE_DEVICES,
+                                                      REQUESTED_PROPERTIES,
+                                                      DeviceInformationKind.AssociationEndpoint);
+            watcher.Added += watcher_Added;
+            watcher.EnumerationCompleted += watcher_EnumerationCompleted;
+        }
+
         /// <summary>
         /// 搜索周围BLE设备
         /// </summary>

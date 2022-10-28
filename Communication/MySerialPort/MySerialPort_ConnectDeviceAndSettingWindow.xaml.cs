@@ -20,12 +20,12 @@ namespace MyEmmControl.Communication
     /// </summary>
     public partial class MySerialPort_ConnectDeviceAndSettingWindow : Window
     {
-        private MySerialPort serialPort;
+        private MySerialPort mySerialPort;
 
         public MySerialPort_ConnectDeviceAndSettingWindow(MySerialPort serialPort)
         {
             InitializeComponent();
-            this.serialPort = serialPort;
+            this.mySerialPort = serialPort;
 
             //获取串口列表
             cbx_SerialPortList.DataContext = SerialPort.GetPortNames();
@@ -41,14 +41,14 @@ namespace MyEmmControl.Communication
 
         private async void btn_Open_Click(object sender, RoutedEventArgs e)
         {
-            serialPort.serialPort.PortName = cbx_SerialPortList.SelectedItem.ToString();
-            serialPort.serialPort.BaudRate = int.Parse(cbx_BaudRate.SelectedItem.ToString());
-            serialPort.serialPort.Parity =  GetSelectedParity();
-            serialPort.serialPort.DataBits = int.Parse(cbx_DataBits.SelectedItem.ToString());
-            serialPort.serialPort.StopBits = GetSelectedStopBits();
+            mySerialPort.serialPort.PortName = cbx_SerialPortList.SelectedItem.ToString();
+            mySerialPort.serialPort.BaudRate = int.Parse(cbx_BaudRate.SelectedItem.ToString());
+            mySerialPort.serialPort.Parity =  GetSelectedParity();
+            mySerialPort.serialPort.DataBits = int.Parse(cbx_DataBits.SelectedItem.ToString());
+            mySerialPort.serialPort.StopBits = GetSelectedStopBits();
             try
             {
-                serialPort.Open();
+                mySerialPort.Open();
             }
             catch (Exception)
             {
@@ -59,7 +59,6 @@ namespace MyEmmControl.Communication
             await Task.Delay(1000);
             this.DialogResult = true;
         }
-
 
         /// <summary>
         /// 获取窗体选中的奇偶校验
