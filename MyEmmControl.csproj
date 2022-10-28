@@ -63,6 +63,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Communication\MySerialPort\MySerialPort_ConnectDeviceAndSettingWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -75,6 +79,10 @@
     <Compile Include="Communication\ICommunication.cs" />
     <Compile Include="Communication\MyBLE\MyBLE_ConnectDeviceAndSettingWindow.xaml.cs">
       <DependentUpon>MyBLE_ConnectDeviceAndSettingWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Communication\MySerialPort\MySerialPort.cs" />
+    <Compile Include="Communication\MySerialPort\MySerialPort_ConnectDeviceAndSettingWindow.xaml.cs">
+      <DependentUpon>MySerialPort_ConnectDeviceAndSettingWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Communication\MyXbox\Button.cs" />
     <Compile Include="Communication\MyXbox\FilterKalman.cs" />
@@ -125,5 +133,6 @@
       <Version>2.3.1</Version>
     </PackageReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

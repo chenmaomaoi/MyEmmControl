@@ -161,7 +161,7 @@ namespace MyEmmControl.Communication
 
         public bool? ConnectDeviceAndSettingWindow()
         {
-            //todo:设置与连接
+            //设置与连接
             return new MyBLE_ConnectDeviceAndSettingWindow(this).ShowDialog();
         }
         #endregion
