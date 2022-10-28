@@ -5,6 +5,7 @@ using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
+using MyEmmControl.Communication;
 
 namespace MyEmmControl
 {
@@ -15,7 +16,8 @@ namespace MyEmmControl
     {
         private void Application_Startup(object sender, StartupEventArgs e)
         {
-            new MainWindow().Show();
+            //new MainWindow().Show();
+            new MyBLE_ConnectDeviceAndSettingWindow(new MyBLE()).ShowDialog();
         }
     }
 }

@@ -7,28 +7,6 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
     <Grid>
-        <Button x:Name="btn_Connect" Content="搜索" HorizontalAlignment="Left" Margin="71,172,0,0" VerticalAlignment="Top" Click="btn_Connect_Click" Height="29" Width="65"/>
-        <ListView x:Name="list_DiscoveredDevices" HorizontalAlignment="Left" Height="157" Margin="71,217,0,0" VerticalAlignment="Top" Width="546" d:ItemsSource="{d:SampleData ItemCount=5}">
-            <ListView.View>
-                <GridView>
-                    <GridViewColumn/>
-                </GridView>
-            </ListView.View>
-            <ListView.Style>
-                <Style TargetType="ListView">
-                    <Setter Property="ItemContainerStyle">
-                        <Setter.Value>
-                            <Style TargetType="ListViewItem">
-                                <EventSetter Event="MouseDoubleClick" Handler="Item_MouseDoubleClick"/>
-                            </Style>
-                        </Setter.Value>
-                    </Setter>
-                </Style>
-            </ListView.Style>
-
-        </ListView>
-        <ProgressBar x:Name="progress_Discover" HorizontalAlignment="Left" Height="30" Margin="141,172,0,0" VerticalAlignment="Top" Width="476"/>
-        <Label x:Name="lab_Status" Content="Label111" HorizontalAlignment="Left" Margin="71,100,0,0" VerticalAlignment="Top" Width="546"/>
-
+        
     </Grid>
 </Window>

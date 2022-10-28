@@ -162,7 +162,7 @@ namespace MyEmmControl.Communication
         public bool? ConnectDeviceAndSettingWindow()
         {
             //todo:设置与连接
-            throw new NotImplementedException();
+            return new MyBLE_ConnectDeviceAndSettingWindow(this).ShowDialog();
         }
         #endregion
 
