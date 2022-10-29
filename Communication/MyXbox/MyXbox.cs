@@ -133,13 +133,16 @@ namespace MyEmmControl.Communication
                     }
                     buttonFlags = state.Gamepad.Buttons;
 
+                    Type _attType = typeof(ButtonAttribute);
+                    Type _buttonFlagType = typeof(GamepadButtonFlags);
+
                     foreach (Button button in Buttons)
                     {
                         //遍历每个按钮，获取状态变化
-                        ButtonAttribute att = button.Name.GetAttribute<ButtonAttribute>();
+                        ButtonAttribute att = button.Name.GetAttribute<ButtonAttribute>(_attType);
                         string name = att?.ButtonName;
 
-                        GamepadButtonFlags flag = (GamepadButtonFlags)Enum.Parse(typeof(GamepadButtonFlags), name);
+                        GamepadButtonFlags flag = (GamepadButtonFlags)Enum.Parse(_buttonFlagType, name);
                         button.IsPressed = ((buttonFlags & flag) == flag);
                     }
 
