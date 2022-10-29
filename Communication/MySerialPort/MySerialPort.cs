@@ -31,7 +31,7 @@ namespace MyEmmControl.Communication
 
         public bool? ConnectDeviceAndSettingWindow(Window owner)
         {
-            var dia =new MySerialPort_ConnectDeviceAndSettingWindow(this);
+            var dia = new MySerialPort_ConnectDeviceAndSettingWindow(this);
             dia.Owner = owner;
             return dia.ShowDialog();
         }

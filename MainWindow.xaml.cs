@@ -18,7 +18,7 @@ namespace MyEmmControl
     /// </summary>
     public partial class MainWindow : Window
     {
-        private string prefix;
+        private string prefix = null;
 
         public MainWindow()
         {
@@ -30,7 +30,10 @@ namespace MyEmmControl
             foreach (var v in types)
             {
                 cbx_CommunicationType.Items.Add(v.Name);
-                prefix = v.Namespace + '.';
+                if (string.IsNullOrEmpty(prefix))
+                {
+                    prefix = v.Namespace + '.';
+                }
             }
         }
 

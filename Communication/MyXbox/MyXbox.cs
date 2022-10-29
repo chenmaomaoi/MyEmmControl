@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using SharpDX.XInput;
@@ -98,9 +99,9 @@ namespace MyEmmControl.Communication
             LS.StickValueChanged += (sender, e) => LSValueChanged?.Invoke(sender, e);
             RS.StickValueChanged += (sender, e) => RSValueChanged?.Invoke(sender, e);
 
-            for (int i = 0; i < Enum.GetValues(typeof(ButtonName)).Length; i++)
+            foreach (var item in typeof(ButtonName).GetEnumValues())
             {
-                Buttons.Add(new Button((ButtonName)i));
+                Buttons.Add(new Button((ButtonName)item));
             }
 
             Controller = new Controller(UserIndex.One);
@@ -108,7 +109,7 @@ namespace MyEmmControl.Communication
             {
                 while (true)
                 {
-                    Thread.Sleep(5);
+                    Thread.Sleep(5);    //防止过高资源占用
                     if (!Controller.IsConnected)
                     {
                         Thread.Sleep(3000);
@@ -132,20 +133,15 @@ namespace MyEmmControl.Communication
                     }
                     buttonFlags = state.Gamepad.Buttons;
 
-                    Buttons[(int)ButtonName.LB].IsPressed = ((buttonFlags & GamepadButtonFlags.LeftShoulder) == GamepadButtonFlags.LeftShoulder);
-                    Buttons[(int)ButtonName.LS].IsPressed = ((buttonFlags & GamepadButtonFlags.LeftThumb) == GamepadButtonFlags.LeftThumb);
-                    Buttons[(int)ButtonName.BACK].IsPressed = ((buttonFlags & GamepadButtonFlags.Back) == GamepadButtonFlags.Back);
-                    Buttons[(int)ButtonName.UP].IsPressed = ((buttonFlags & GamepadButtonFlags.DPadUp) == GamepadButtonFlags.DPadUp);
-                    Buttons[(int)ButtonName.RIGHT].IsPressed = ((buttonFlags & GamepadButtonFlags.DPadRight) == GamepadButtonFlags.DPadRight);
-                    Buttons[(int)ButtonName.DOWN].IsPressed = ((buttonFlags & GamepadButtonFlags.DPadDown) == GamepadButtonFlags.DPadDown);
-                    Buttons[(int)ButtonName.LEFT].IsPressed = ((buttonFlags & GamepadButtonFlags.DPadLeft) == GamepadButtonFlags.DPadLeft);
-                    Buttons[(int)ButtonName.RB].IsPressed = ((buttonFlags & GamepadButtonFlags.RightShoulder) == GamepadButtonFlags.RightShoulder);
-                    Buttons[(int)ButtonName.RS].IsPressed = ((buttonFlags & GamepadButtonFlags.RightThumb) == GamepadButtonFlags.RightThumb);
-                    Buttons[(int)ButtonName.START].IsPressed = ((buttonFlags & GamepadButtonFlags.Start) == GamepadButtonFlags.Start);
-                    Buttons[(int)ButtonName.X].IsPressed = ((buttonFlags & GamepadButtonFlags.X) == GamepadButtonFlags.X);
-                    Buttons[(int)ButtonName.Y].IsPressed = ((buttonFlags & GamepadButtonFlags.Y) == GamepadButtonFlags.Y);
-                    Buttons[(int)ButtonName.A].IsPressed = ((buttonFlags & GamepadButtonFlags.A) == GamepadButtonFlags.A);
-                    Buttons[(int)ButtonName.B].IsPressed = ((buttonFlags & GamepadButtonFlags.B) == GamepadButtonFlags.B);
+                    foreach (Button button in Buttons)
+                    {
+                        //遍历每个按钮，获取状态变化
+                        ButtonAttribute att = button.Name.GetAttribute<ButtonAttribute>();
+                        string name = att?.ButtonName;
+
+                        GamepadButtonFlags flag = (GamepadButtonFlags)Enum.Parse(typeof(GamepadButtonFlags), name);
+                        button.IsPressed = ((buttonFlags & flag) == flag);
+                    }
 
                     if (buttonFlags != GamepadButtonFlags.None)
                     {

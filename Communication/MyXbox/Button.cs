@@ -1,8 +1,39 @@
 ﻿using System;
+using System.Reflection;
 using System.Timers;
 
 namespace MyEmmControl.Communication
 {
+    public static class AttributeEx
+    {
+        public static TAtteibute GetAttribute<TAtteibute>(this object obj) where TAtteibute : Attribute
+        {
+            Type type = obj.GetType();
+            //获取字段信息
+            FieldInfo field = type.GetField(obj.ToString());
+            //检查字段是否含有指定特性
+            if (field.IsDefined(typeof(TAtteibute), true))
+            {
+                //获取字段上的自定义特性
+                TAtteibute remarkAttribute = (TAtteibute)field.GetCustomAttribute(typeof(TAtteibute));
+                return remarkAttribute;
+            }
+            else
+            {
+                return null;
+            }
+        }
+    }
+
+    public class ButtonAttribute : Attribute
+    {
+        public string ButtonName { get; set; }
+        public ButtonAttribute(string buttonName)
+        {
+            ButtonName = buttonName;
+        }
+    }
+
     public partial class MyXbox
     {
         /// <summary>
@@ -10,13 +41,20 @@ namespace MyEmmControl.Communication
         /// </summary>
         public enum ButtonName
         {
-            LB, LS,
-            BACK,
-            UP, RIGHT, DOWN, LEFT,
-
-            RB, RS,
-            START,
-            X, Y, A, B
+            [Button("LeftShoulder")] LB,
+            [Button("LeftThumb")] LS,
+            [Button("Back")] BACK,
+            [Button("DPadUp")] UP,
+            [Button("DPadRight")] RIGHT,
+            [Button("DPadDown")] DOWN,
+            [Button("DPadLeft")] LEFT,
+            [Button("RightShoulder")] RB,
+            [Button("RightThumb")] RS,
+            [Button("Start")] START,
+            [Button("X")] X,            
+            [Button("Y")] Y,
+            [Button("A")] A,
+            [Button("B")] B
         }
 
         public class Button
