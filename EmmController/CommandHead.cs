@@ -1,0 +1,226 @@
+﻿using MyEmmControl.Attributes;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace MyEmmControl
+{
+    /// <summary>
+    /// 枚举了控制命令头
+    /// </summary>
+    public enum CommandHead
+    {
+        #region 触发动作命令
+        /// <summary>
+        /// 触发编码器校准
+        /// </summary>
+        /// <remarks>无额外参数,通用返回</remarks>
+        [Description("触发编码器校准")]
+        [Command(CommandHeadType.Common, CommandReturnType.Common, new byte[] { 0x06, 0x45 })]
+        CalibrationEncoder,
+
+        /// <summary>
+        /// 设置当前位置为零点
+        /// </summary>
+        /// <remarks>无额外参数,通用返回</remarks>
+        [Description("设置当前位置为零点")]
+        [Command(CommandHeadType.Common, CommandReturnType.Common, new byte[] { 0x0A, 0X6D })]
+        SetInitiationPoint,
+
+        /// <summary>
+        /// 解除堵转保护
+        /// </summary>
+        /// <remarks>无额外参数,通用返回</remarks>
+        [Description("解除堵转保护")]
+        [Command(CommandHeadType.Common, CommandReturnType.Common, new byte[] { 0x0E, 0x52 })]
+        ResetBlockageProtection,
+        #endregion
+
+        #region 读取参数命令
+        /// <summary>
+        /// 读取编码器值
+        /// </summary>
+        /// <remarks>无额外参数,返回编码器数值 uint16</remarks>
+        [Description("读取编码器值")]
+        [Command(CommandHeadType.Common, CommandReturnType.Encoder, new byte[] { 0x30 })]
+        ReadEncoderValue,
+
+        /// <summary>
+        /// 读取脉冲数
+        /// </summary>
+        /// <remarks>无额外参数,返回脉冲数 int32</remarks>
+        [Description("读取脉冲数")]
+        [Command(CommandHeadType.Common, CommandReturnType.Puls, new byte[] { 0x33 })]
+        ReadPulsCount,
+
+        /// <summary>
+        /// 读取电机实时位置
+        /// </summary>
+        /// <remarks>无额外参数,返回电机位置 int32</remarks>
+        [Description("读取电机实时位置")]
+        [Command(CommandHeadType.Common, CommandReturnType.MotorPosition, new byte[] { 0x36 })]
+        ReadMotorPosition,
+
+        /// <summary>
+        /// 读取位置误差
+        /// </summary>
+        /// <remarks>无额外参数,返回位置误差 int16</remarks>
+        [Description("读取位置误差")]
+        [Command(CommandHeadType.Common, CommandReturnType.PositionError, new byte[] { 0x36 })]
+        ReadPositionError,
+
+        /// <summary>
+        /// 读取驱动板使能状态
+        /// </summary>
+        /// <remarks>无额外参数,返回状态信息 byte=>bool</remarks>
+        [Description("读取驱动板使能状态")]
+        [Command(CommandHeadType.Common, CommandReturnType.State, new byte[] { 0x3A })]
+        IsEnable,
+
+        /// <summary>
+        /// 读取堵转状态
+        /// </summary>
+        /// <remarks>
+        /// 无额外参数,返回状态信息 byte=>bool <para/>
+        /// false:未发生堵转 <para/>
+        /// true:堵转
+        /// </remarks>
+        [Description("读取堵转状态")]
+        [Command(CommandHeadType.Common, CommandReturnType.State, new byte[] { 0x3E })]
+        ReadBlockageProtectionState,
+
+        /// <summary>
+        /// 读取单圈上电回零状态(失败为true)
+        /// </summary>
+        /// <remarks>
+        /// 无额外参数,返回状态信息 byte=>bool <para/>
+        /// false:回零正常 <para/>
+        /// true:回零失败
+        /// </remarks>
+        [Description("读取单圈上电回零状态")]
+        [Command(CommandHeadType.Common, CommandReturnType.State, new byte[] { 0x3A })]
+        ReadInitiationState,
+        #endregion
+
+        #region 修改参数命令
+        /// <summary>
+        /// 修改细分步数
+        /// </summary>
+        /// <remarks>
+        /// byte[1] 细分参数 <para/>
+        /// 00=>256细分<para/>
+        /// 01=>1细分<para/>
+        /// FF=>255细分<para/>
+        /// 通用返回
+        /// </remarks>
+        [Description("修改细分步数")]
+        [Command(CommandHeadType.Subdivision, CommandReturnType.Common, new byte[] { 0x84 })]
+        UpdateSubdivision,
+
+        /// <summary>
+        /// 修改串口通讯地址
+        /// </summary>
+        /// <remarks>
+        /// byte[1] 通讯地址 <para/>
+        /// 可用值1-247(0xF7)<para/>
+        /// 通用返回
+        /// </remarks>
+        [Description("修改串口通讯地址")]
+        [Command(CommandHeadType.UARTAddr, CommandReturnType.Common, new byte[] { 0xAE })]
+        UpdateUARTAddr,
+        #endregion
+
+        #region 运动控制命令
+        /// <summary>
+        /// 使能驱动板
+        /// </summary>
+        /// <remarks>无额外参数,返回状态信息 byte=>bool</remarks>
+        [Description("使能驱动板")]
+        [Command(CommandHeadType.Common, CommandReturnType.State, new byte[] { 0xF3, 0x00 })]
+        Disable,
+
+        [Description("关闭驱动板")]
+        [Command(CommandHeadType.Common, CommandReturnType.State, new byte[] { 0xF3, 0x01 })]
+        Enable,
+
+        /// <summary>
+        /// 控制电机转动
+        /// </summary>
+        /// <remarks>
+        /// 速度模式<para/>
+        /// 电机将一直以设置的速度转动下去<para/>
+        /// byte[2] 方向和速度<para/>
+        /// --最高半字节0x0=>顺时针 0x1=>逆时针<para/>
+        /// --0x4FF => 速度挡位<para/>
+        /// byte[1] 加速度<para/>
+        /// 通用返回
+        /// </remarks>
+        [Description("控制电机转动-速度模式")]
+        [Command(CommandHeadType.Rotation, CommandReturnType.Common, new byte[] { 0xF6 })]
+        SetRotation,
+
+        /// <summary>
+        /// 存储电机正反转参数
+        /// </summary>
+        /// <remarks>
+        /// 电机上电之后将根据保存的速度控制模式转动 <para/>
+        /// 无额外参数,通用返回
+        /// </remarks>
+        [Description("存储转动参数")]
+        [Command(CommandHeadType.Common, CommandReturnType.Common, new byte[] { 0xFF, 0xC8 })]
+        StoreRotation,
+
+        /// <summary>
+        /// 清除电机正反转参数
+        /// </summary>
+        /// <remarks>无额外参数,通用返回</remarks>
+        [Description("清除转动参数")]
+        [Command(CommandHeadType.Common, CommandReturnType.Common, new byte[] { 0xFF, 0xCA })]
+        RestoreRotation,
+
+        /// <summary>
+        /// 控制电机转动
+        /// </summary>
+        /// <remarks>
+        /// 位置模式<para/>
+        /// 电机转动到设定位置后停止<para/>
+        /// 指令和返回需要特殊处理
+        /// </remarks>
+        [Description("控制电机转动-位置模式")]
+        [Command(CommandHeadType.Position, CommandReturnType.SPosition, new byte[] { 0xFD })]
+        SetPosition
+        #endregion
+    }
+
+
+    public enum CommandHeadType
+    {
+        /// <summary>
+        /// 没有命令体的大多数命令
+        /// </summary>
+        Common,
+
+        /// <summary>
+        /// 细分
+        /// </summary>
+        Subdivision,
+
+        /// <summary>
+        /// 串口通信地址
+        /// </summary>
+        UARTAddr,
+
+        /// <summary>
+        /// 速度模式
+        /// </summary>
+        Rotation,
+
+        /// <summary>
+        /// 位置模式
+        /// </summary>
+        Position
+    }
+}

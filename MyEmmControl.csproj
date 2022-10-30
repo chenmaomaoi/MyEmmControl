@@ -75,6 +75,7 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Attributes\CommandAttribute.cs" />
     <Compile Include="Communication\MyBLE\MyBLE.cs" />
     <Compile Include="Communication\ICommunication.cs" />
     <Compile Include="Communication\MyBLE\MyBLE_ConnectDeviceAndSettingWindow.xaml.cs">
@@ -84,10 +85,14 @@
     <Compile Include="Communication\MySerialPort\MySerialPort_ConnectDeviceAndSettingWindow.xaml.cs">
       <DependentUpon>MySerialPort_ConnectDeviceAndSettingWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Attributes\AttributeEx.cs" />
     <Compile Include="Communication\MyXbox\Button.cs" />
     <Compile Include="Communication\MyXbox\FilterKalman.cs" />
     <Compile Include="Communication\MyXbox\StickValue.cs" />
     <Compile Include="Communication\MyXbox\MyXbox.cs" />
+    <Compile Include="EmmController\CommandHead.cs" />
+    <Compile Include="EmmController\CommandReturn.cs" />
+    <Compile Include="EmmController\EmmController.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>

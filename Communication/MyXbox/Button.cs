@@ -1,46 +1,9 @@
 ﻿using System;
-using System.Reflection;
+using System.ComponentModel;
 using System.Timers;
 
 namespace MyEmmControl.Communication
 {
-    public static class AttributeEx
-    {
-        /// <summary>
-        /// 获取字段上的自定义特性
-        /// </summary>
-        /// <typeparam name="TAtteibute"></typeparam>
-        /// <param name="obj"></param>
-        /// <param name="attributeType">typeof(TAtteibute)</param>
-        /// <returns></returns>
-        public static TAtteibute GetAttribute<TAtteibute>(this object obj, Type attributeType) where TAtteibute : Attribute
-        {
-            Type type = obj.GetType();
-            //获取字段信息
-            FieldInfo field = type.GetField(obj.ToString());
-            //检查字段是否含有指定特性
-            if (field.IsDefined(attributeType, true))
-            {
-                //获取字段上的自定义特性
-                TAtteibute remarkAttribute = (TAtteibute)field.GetCustomAttribute(attributeType);
-                return remarkAttribute;
-            }
-            else
-            {
-                return null;
-            }
-        }
-    }
-
-    public class ButtonAttribute : Attribute
-    {
-        public string ButtonName { get; set; }
-        public ButtonAttribute(string buttonName)
-        {
-            ButtonName = buttonName;
-        }
-    }
-
     public partial class MyXbox
     {
         /// <summary>
@@ -48,20 +11,20 @@ namespace MyEmmControl.Communication
         /// </summary>
         public enum ButtonName
         {
-            [Button("LeftShoulder")] LB,
-            [Button("LeftThumb")] LS,
-            [Button("Back")] BACK,
-            [Button("DPadUp")] UP,
-            [Button("DPadRight")] RIGHT,
-            [Button("DPadDown")] DOWN,
-            [Button("DPadLeft")] LEFT,
-            [Button("RightShoulder")] RB,
-            [Button("RightThumb")] RS,
-            [Button("Start")] START,
-            [Button("X")] X,            
-            [Button("Y")] Y,
-            [Button("A")] A,
-            [Button("B")] B
+            [Description("LeftShoulder")] LB,
+            [Description("LeftThumb")] LS,
+            [Description("Back")] BACK,
+            [Description("DPadUp")] UP,
+            [Description("DPadRight")] RIGHT,
+            [Description("DPadDown")] DOWN,
+            [Description("DPadLeft")] LEFT,
+            [Description("RightShoulder")] RB,
+            [Description("RightThumb")] RS,
+            [Description("Start")] START,
+            [Description("X")] X,            
+            [Description("Y")] Y,
+            [Description("A")] A,
+            [Description("B")] B
         }
 
         public class Button

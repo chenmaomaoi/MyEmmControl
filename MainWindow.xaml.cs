@@ -48,7 +48,7 @@ namespace MyEmmControl
             {
                 //todo:已连接，进入主控制页面
 
-                
+                throw new NotImplementedException();
             }
             else
             {

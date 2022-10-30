@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
+using MyEmmControl.Attributes;
 using SharpDX.XInput;
 
 namespace MyEmmControl.Communication
@@ -133,14 +135,14 @@ namespace MyEmmControl.Communication
                     }
                     buttonFlags = state.Gamepad.Buttons;
 
-                    Type _attType = typeof(ButtonAttribute);
+                    Type _attType = typeof(DescriptionAttribute);
                     Type _buttonFlagType = typeof(GamepadButtonFlags);
 
                     foreach (Button button in Buttons)
                     {
                         //遍历每个按钮，获取状态变化
-                        ButtonAttribute att = button.Name.GetAttribute<ButtonAttribute>(_attType);
-                        string name = att?.ButtonName;
+                        DescriptionAttribute att = button.Name.GetAttribute<DescriptionAttribute>(_attType);
+                        string name = att?.Description;
 
                         GamepadButtonFlags flag = (GamepadButtonFlags)Enum.Parse(_buttonFlagType, name);
                         button.IsPressed = ((buttonFlags & flag) == flag);
