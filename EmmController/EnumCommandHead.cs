@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MyEmmControl
+namespace MyEmmControl.EmmController
 {
     /// <summary>
     /// 枚举了控制命令头

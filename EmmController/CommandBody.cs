@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace MyEmmControl
+namespace MyEmmControl.EmmController
 {
     public class CommandBody
     {

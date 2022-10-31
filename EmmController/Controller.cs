@@ -4,9 +4,9 @@ using System;
 using System.Linq;
 using Windows.Foundation;
 
-namespace MyEmmControl
+namespace MyEmmControl.EmmController
 {
-    public class EmmController
+    public class Controller
     {
         /// <summary>
         /// 通信地址
@@ -94,7 +94,7 @@ namespace MyEmmControl
 
         private event EventHandler<byte[]> recvdData;
 
-        public EmmController(ICommunication communication)
+        public Controller(ICommunication communication)
         {
             this.communication = communication;
             this.communication.OnRecvdData += (object sender, byte[] e) =>
@@ -138,7 +138,7 @@ namespace MyEmmControl
                        : UARTAddr.Concat(_head).Concat(cmdBody.GetCommandBody()).Concat(dataCheck).ToArray();
 
             //绑定返回处理
-            typeof(EmmController).GetMethod(cmdhead.ToString())?.Invoke(this, null);
+            typeof(Controller).GetMethod(cmdhead.ToString())?.Invoke(this, null);
 
             communication.Send(_cmd);
         }

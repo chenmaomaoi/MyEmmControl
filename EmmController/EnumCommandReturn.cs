@@ -1,4 +1,4 @@
-﻿namespace MyEmmControl
+﻿namespace MyEmmControl.EmmController
 {
     /// <summary>
     /// 枚举了返回值

@@ -11,10 +11,10 @@ using MyEmmControl.Communication;
 using SharpDX.Text;
 using Windows.Devices.Enumeration;
 
-namespace MyEmmControl
+namespace MyEmmControl.View
 {
     /// <summary>
-    /// MainWindow.xaml 的交互逻辑
+    /// SelectCommunicationMode_Window.xaml 的交互逻辑
     /// </summary>
     public partial class SelectCommunicationMode_Window : Window
     {
@@ -48,9 +48,7 @@ namespace MyEmmControl
             {
                 //todo:已连接，进入主控制页面
 
-                //测试用
-                var v = new EmmController(communication);
-                //throw new NotImplementedException();
+                throw new NotImplementedException();
             }
             else
             {

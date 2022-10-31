@@ -70,7 +70,7 @@ namespace MyEmmControl.Communication
         private FilterKalman[] kalman = new FilterKalman[6];
         private bool useFilter;
 
-        public readonly Controller Controller;
+        public readonly SharpDX.XInput.Controller Controller;
 
         /// <summary>
         /// 震动
@@ -106,7 +106,7 @@ namespace MyEmmControl.Communication
                 Buttons.Add(new Button((ButtonName)item));
             }
 
-            Controller = new Controller(UserIndex.One);
+            Controller = new SharpDX.XInput.Controller(UserIndex.One);
             Task.Run(() =>
             {
                 while (true)

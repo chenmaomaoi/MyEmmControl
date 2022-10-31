@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using MyEmmControl.Communication;
+using MyEmmControl.View;
 
 namespace MyEmmControl
 {
