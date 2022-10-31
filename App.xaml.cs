@@ -16,7 +16,7 @@ namespace MyEmmControl
     {
         private void Application_Startup(object sender, StartupEventArgs e)
         {
-            new MainWindow().Show();
+            new SelectCommunicationMode_Window().Show();
             //new MyBLE_ConnectDeviceAndSettingWindow(new MyBLE()).ShowDialog();
         }
     }

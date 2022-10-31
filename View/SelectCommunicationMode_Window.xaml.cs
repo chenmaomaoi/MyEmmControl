@@ -16,11 +16,11 @@ namespace MyEmmControl
     /// <summary>
     /// MainWindow.xaml 的交互逻辑
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class SelectCommunicationMode_Window : Window
     {
         private string prefix = null;
 
-        public MainWindow()
+        public SelectCommunicationMode_Window()
         {
             InitializeComponent();
 
@@ -48,7 +48,9 @@ namespace MyEmmControl
             {
                 //todo:已连接，进入主控制页面
 
-                throw new NotImplementedException();
+                //测试用
+                var v = new EmmController(communication);
+                //throw new NotImplementedException();
             }
             else
             {

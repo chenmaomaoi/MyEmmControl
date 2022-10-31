@@ -11,7 +11,7 @@ namespace MyEmmControl
     /// <summary>
     /// 枚举了控制命令头
     /// </summary>
-    public enum CommandHead
+    public enum EnumCommandHead
     {
         #region 触发动作命令
         /// <summary>
@@ -19,7 +19,7 @@ namespace MyEmmControl
         /// </summary>
         /// <remarks>无额外参数,通用返回</remarks>
         [Description("触发编码器校准")]
-        [Command(CommandHeadType.Common, CommandReturnType.Common, new byte[] { 0x06, 0x45 })]
+        [Command(new byte[] { 0x06, 0x45 })]
         CalibrationEncoder,
 
         /// <summary>
@@ -27,7 +27,7 @@ namespace MyEmmControl
         /// </summary>
         /// <remarks>无额外参数,通用返回</remarks>
         [Description("设置当前位置为零点")]
-        [Command(CommandHeadType.Common, CommandReturnType.Common, new byte[] { 0x0A, 0X6D })]
+        [Command(new byte[] { 0x0A, 0X6D })]
         SetInitiationPoint,
 
         /// <summary>
@@ -35,7 +35,7 @@ namespace MyEmmControl
         /// </summary>
         /// <remarks>无额外参数,通用返回</remarks>
         [Description("解除堵转保护")]
-        [Command(CommandHeadType.Common, CommandReturnType.Common, new byte[] { 0x0E, 0x52 })]
+        [Command(new byte[] { 0x0E, 0x52 })]
         ResetBlockageProtection,
         #endregion
 
@@ -45,7 +45,7 @@ namespace MyEmmControl
         /// </summary>
         /// <remarks>无额外参数,返回编码器数值 uint16</remarks>
         [Description("读取编码器值")]
-        [Command(CommandHeadType.Common, CommandReturnType.Encoder, new byte[] { 0x30 })]
+        [Command(new byte[] { 0x30 })]
         ReadEncoderValue,
 
         /// <summary>
@@ -53,7 +53,7 @@ namespace MyEmmControl
         /// </summary>
         /// <remarks>无额外参数,返回脉冲数 int32</remarks>
         [Description("读取脉冲数")]
-        [Command(CommandHeadType.Common, CommandReturnType.Puls, new byte[] { 0x33 })]
+        [Command(new byte[] { 0x33 })]
         ReadPulsCount,
 
         /// <summary>
@@ -61,7 +61,7 @@ namespace MyEmmControl
         /// </summary>
         /// <remarks>无额外参数,返回电机位置 int32</remarks>
         [Description("读取电机实时位置")]
-        [Command(CommandHeadType.Common, CommandReturnType.MotorPosition, new byte[] { 0x36 })]
+        [Command(new byte[] { 0x36 })]
         ReadMotorPosition,
 
         /// <summary>
@@ -69,7 +69,7 @@ namespace MyEmmControl
         /// </summary>
         /// <remarks>无额外参数,返回位置误差 int16</remarks>
         [Description("读取位置误差")]
-        [Command(CommandHeadType.Common, CommandReturnType.PositionError, new byte[] { 0x36 })]
+        [Command(new byte[] { 0x36 })]
         ReadPositionError,
 
         /// <summary>
@@ -77,7 +77,7 @@ namespace MyEmmControl
         /// </summary>
         /// <remarks>无额外参数,返回状态信息 byte=>bool</remarks>
         [Description("读取驱动板使能状态")]
-        [Command(CommandHeadType.Common, CommandReturnType.State, new byte[] { 0x3A })]
+        [Command(new byte[] { 0x3A })]
         IsEnable,
 
         /// <summary>
@@ -89,7 +89,7 @@ namespace MyEmmControl
         /// true:堵转
         /// </remarks>
         [Description("读取堵转状态")]
-        [Command(CommandHeadType.Common, CommandReturnType.State, new byte[] { 0x3E })]
+        [Command(new byte[] { 0x3E })]
         ReadBlockageProtectionState,
 
         /// <summary>
@@ -101,7 +101,7 @@ namespace MyEmmControl
         /// true:回零失败
         /// </remarks>
         [Description("读取单圈上电回零状态")]
-        [Command(CommandHeadType.Common, CommandReturnType.State, new byte[] { 0x3A })]
+        [Command(new byte[] { 0x3A })]
         ReadInitiationState,
         #endregion
 
@@ -117,7 +117,7 @@ namespace MyEmmControl
         /// 通用返回
         /// </remarks>
         [Description("修改细分步数")]
-        [Command(CommandHeadType.Subdivision, CommandReturnType.Common, new byte[] { 0x84 })]
+        [Command(new byte[] { 0x84 })]
         UpdateSubdivision,
 
         /// <summary>
@@ -129,7 +129,7 @@ namespace MyEmmControl
         /// 通用返回
         /// </remarks>
         [Description("修改串口通讯地址")]
-        [Command(CommandHeadType.UARTAddr, CommandReturnType.Common, new byte[] { 0xAE })]
+        [Command(new byte[] { 0xAE })]
         UpdateUARTAddr,
         #endregion
 
@@ -137,14 +137,14 @@ namespace MyEmmControl
         /// <summary>
         /// 使能驱动板
         /// </summary>
-        /// <remarks>无额外参数,返回状态信息 byte=>bool</remarks>
+        /// <remarks>无额外参数,通用返回</remarks>
         [Description("使能驱动板")]
-        [Command(CommandHeadType.Common, CommandReturnType.State, new byte[] { 0xF3, 0x00 })]
-        Disable,
+        [Command(new byte[] { 0xF3, 0x01 })]
+        Enable,
 
         [Description("关闭驱动板")]
-        [Command(CommandHeadType.Common, CommandReturnType.State, new byte[] { 0xF3, 0x01 })]
-        Enable,
+        [Command(new byte[] { 0xF3, 0x00 })]
+        Disable,
 
         /// <summary>
         /// 控制电机转动
@@ -159,7 +159,7 @@ namespace MyEmmControl
         /// 通用返回
         /// </remarks>
         [Description("控制电机转动-速度模式")]
-        [Command(CommandHeadType.Rotation, CommandReturnType.Common, new byte[] { 0xF6 })]
+        [Command(new byte[] { 0xF6 })]
         SetRotation,
 
         /// <summary>
@@ -170,7 +170,7 @@ namespace MyEmmControl
         /// 无额外参数,通用返回
         /// </remarks>
         [Description("存储转动参数")]
-        [Command(CommandHeadType.Common, CommandReturnType.Common, new byte[] { 0xFF, 0xC8 })]
+        [Command(new byte[] { 0xFF, 0xC8 })]
         StoreRotation,
 
         /// <summary>
@@ -178,7 +178,7 @@ namespace MyEmmControl
         /// </summary>
         /// <remarks>无额外参数,通用返回</remarks>
         [Description("清除转动参数")]
-        [Command(CommandHeadType.Common, CommandReturnType.Common, new byte[] { 0xFF, 0xCA })]
+        [Command(new byte[] { 0xFF, 0xCA })]
         RestoreRotation,
 
         /// <summary>
@@ -187,40 +187,16 @@ namespace MyEmmControl
         /// <remarks>
         /// 位置模式<para/>
         /// 电机转动到设定位置后停止<para/>
+        /// byte[2] 方向和速度<para/>
+        /// --最高半字节0x0=>顺时针 0x1=>逆时针<para/>
+        /// --0x4FF => 速度挡位<para/>
+        /// byte[1] 加速度<para/>
+        /// byte[3] 脉冲数<para/>
         /// 指令和返回需要特殊处理
         /// </remarks>
         [Description("控制电机转动-位置模式")]
-        [Command(CommandHeadType.Position, CommandReturnType.SPosition, new byte[] { 0xFD })]
+        [Command(new byte[] { 0xFD })]
         SetPosition
         #endregion
-    }
-
-
-    public enum CommandHeadType
-    {
-        /// <summary>
-        /// 没有命令体的大多数命令
-        /// </summary>
-        Common,
-
-        /// <summary>
-        /// 细分
-        /// </summary>
-        Subdivision,
-
-        /// <summary>
-        /// 串口通信地址
-        /// </summary>
-        UARTAddr,
-
-        /// <summary>
-        /// 速度模式
-        /// </summary>
-        Rotation,
-
-        /// <summary>
-        /// 位置模式
-        /// </summary>
-        Position
     }
 }
