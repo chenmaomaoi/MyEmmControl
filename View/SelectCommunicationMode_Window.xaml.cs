@@ -46,16 +46,15 @@ namespace MyEmmControl.View
             bool res = (bool)communication.ConnectDeviceAndSettingWindow(this);
             if (res)
             {
-                //todo:已连接，进入主控制页面
+                App.MainWindow.controller = new EmmController.Controller(communication);
 
-                throw new NotImplementedException();
+                this.Close();
             }
             else
             {
                 //返回
                 MessageBox.Show("未连接");
             }
-
         }
     }
 }

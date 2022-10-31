@@ -114,8 +114,6 @@ namespace MyEmmControl.EmmController
                         recvdData?.Invoke(sender, e);
                     }
                 };
-
-            SendCommand(EnumCommandHead.CalibrationEncoder);
         }
 
         /// <summary>
@@ -377,7 +375,7 @@ namespace MyEmmControl.EmmController
                     case EnumCommandHead.UpdateUARTAddr: if (_result && _cmdbody.Length == 1) this.UARTAddr = new byte[] { _cmdbody[0] }; break;
                     case EnumCommandHead.Enable: if (_result) this.BoardIsEnable = true; break;
                     case EnumCommandHead.Disable: if (_result) this.BoardIsEnable = false; break;
-                    case EnumCommandHead.SetRotation: if(_result) this.RotationCurrent = cmdBody; break;
+                    case EnumCommandHead.SetRotation: if (_result) this.RotationCurrent = cmdBody; break;
                     case EnumCommandHead.StoreRotation: if (_result) this.RotationMemory = this.RotationCurrent; break;
                     case EnumCommandHead.RestoreRotation: if (_result) this.RotationMemory = null; break;
 

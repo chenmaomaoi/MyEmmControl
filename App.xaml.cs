@@ -15,10 +15,12 @@ namespace MyEmmControl
     /// </summary>
     public partial class App : Application
     {
+        public new static MainWindow MainWindow;
+
         private void Application_Startup(object sender, StartupEventArgs e)
         {
-            new SelectCommunicationMode_Window().Show();
-            //new MyBLE_ConnectDeviceAndSettingWindow(new MyBLE()).ShowDialog();
+            MainWindow = new MainWindow();
+            MainWindow.Show();
         }
     }
 }

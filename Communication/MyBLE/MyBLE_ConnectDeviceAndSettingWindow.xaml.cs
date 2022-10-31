@@ -26,6 +26,8 @@ namespace MyEmmControl.Communication
 
             ble.DiscoverDevicesComplete += this.Ble_DiscoverDevicesComplete;
             ble.OnRecvdData += Ble_RecvdData;
+
+            btn_SearchDevices.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
         }
 
         private void Ble_RecvdData(object sender, byte[] args)

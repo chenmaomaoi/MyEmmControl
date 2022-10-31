@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 
 namespace MyEmmControl.EmmController
 {
@@ -36,27 +37,21 @@ namespace MyEmmControl.EmmController
         /// </summary>
         public byte[] GetCommandBody()
         {
-            byte[] result;
+            IEnumerable<byte> result;
             if (Direction == null) return new byte[] { (byte)Data };
 
             //拼接方向 速度
             UInt16 _DS = (ushort)((UInt16)Direction | Speed);
-            IEnumerable<byte> _bDS = (IEnumerable<byte>)Convert.ChangeType(_DS, typeof(byte[]));
+            IEnumerable<byte> _bDS = BitConverter.GetBytes(_DS).Reverse();
             //拼接加速度
-            IEnumerable<byte> _bDSA = _bDS.Concat(new byte[] { Acceleration });
+            result = _bDS.Concat(new byte[] { Acceleration });
 
-            if (PulsTimes == null)
-            {
-                result = (byte[])_bDSA;
-
-            }
-            else
+            if (PulsTimes != null)
             {
                 //拼接脉冲数
-                IEnumerable<byte> _bDSAP = _bDSA.Concat((IEnumerable<byte>)Convert.ChangeType(PulsTimes, typeof(byte[])));
-                result = (byte[])_bDSAP;
+                result = result.Concat(BitConverter.GetBytes((UInt32)PulsTimes).Reverse());
             }
-            return result;
+            return result.ToArray();
         }
 
         public override string ToString()
