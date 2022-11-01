@@ -74,9 +74,14 @@ namespace MyEmmControl.EmmController
         public CommandBody RotationCurrent { get; private set; }
 
         /// <summary>
+        /// 数据校验类型
+        /// </summary>
+        public ChecksumType ChecksumType { get; private set; }
+
+        /// <summary>
         /// 指令头
         /// </summary>
-        private EnumCommandHead _cmdHead { get; set; }
+        private CommandHead _cmdHead { get; set; }
 
         /// <summary>
         /// 指令体
@@ -105,7 +110,7 @@ namespace MyEmmControl.EmmController
             this._communication.OnRecvdData += (object sender, byte[] e) =>
                 {
                     byte[] dat = DataFilter(e);
-                    if (dat.Length == 1 && dat[0] == EnumCommandReturn.PcmdRet)
+                    if (dat.Length == 1 && dat[0] == (byte)CommandReturnValue.PcmdRet)
                     {
                         //角度转动模式结束
                         EventSetPositionDone?.Invoke(sender,new EventArgs());
@@ -143,13 +148,13 @@ namespace MyEmmControl.EmmController
         /// </summary>
         /// <param name="cmdhead"></param>
         /// <param name="cmdbody"></param>
-        public string SendCommand(EnumCommandHead cmdhead, CommandBody cmdbody = null)
+        public string SendCommand(CommandHead cmdhead, CommandBody cmdbody = null)
         {
             _cmdHead = cmdhead;
             _cmdBody = cmdbody;
 
             //取命令
-            var headattr = cmdhead.GetAttribute<CommandAttribute>();
+            var headattr = _cmdHead.GetAttribute<CommandAttribute>();
             byte[] head = headattr.Command;
 
             //拼接命令
@@ -157,31 +162,29 @@ namespace MyEmmControl.EmmController
                        ? new byte[] { UARTAddr }.Concat(head).Concat(_dataCheck).ToArray()
                        : new byte[] { UARTAddr }.Concat(head).Concat(_cmdBody.GetCommandBody()).Concat(_dataCheck).ToArray();
 
-
             //倒序
-            List<byte> uartMessgae = DataFilter(_communication.Get(_cmd)).Reverse().ToList();
+            IEnumerable<byte> uartMessgae = DataFilter(_communication.Get(_cmd)).Reverse();
+
+            //解析返回值
+            dynamic retValue = headattr.GetValue(uartMessgae.ToArray());
 
             //绑定返回处理
-            object result = typeof(Controller).GetMethod(cmdhead.ToString())?.Invoke(this, uartMessgae.ConvertAll(v => (object)v).ToArray());
-
+            object result = typeof(Controller).GetMethod(_cmdHead.ToString())?.Invoke(this, retValue);
+            
             return result.ToString();
-            //communication.Send(_cmd);
-
-            //处理返回结果
-
         }
 
         /// <summary>
         /// 编码器校准
         /// </summary>
         /// <remarks>什么都不做，等待就行了</remarks>
-        private bool CalibrationEncoder(byte[] e) => convertRecvCommonAndState(e);
+        //private bool CalibrationEncoder(byte[] e) => convertRecvCommonAndState(e);
 
         /// <summary>
         /// 设置当前位置为零点
         /// </summary>
         /// <remarks>什么都不做，等待就行了</remarks>
-        private bool SetInitiationPoint(byte[] e) => convertRecvCommonAndState(e);
+        //private bool SetInitiationPoint(byte[] e) => convertRecvCommonAndState(e);
 
         /// <summary>
         /// 解除堵转保护
@@ -331,7 +334,7 @@ namespace MyEmmControl.EmmController
         /// <summary>
         /// 控制电机转动
         /// </summary>
-        private bool SetPosition(byte[] e) => convertRecvCommonAndState(e);
+        //private bool SetPosition(byte[] e) => convertRecvCommonAndState(e);
 
         private short convertRecvInt16(byte[] e)
         {
@@ -347,7 +350,7 @@ namespace MyEmmControl.EmmController
         private bool convertRecvCommonAndState(byte[] e)
         {
             if (e.Length != 1) throw new ArgumentOutOfRangeException(nameof(e));
-            return (e[0] == EnumCommandReturn.CommandOK) || (e[0] == EnumCommandReturn.True);
+            return (e[0] == (byte)CommandReturnValue.CommandOK) || (e[0] == (byte)CommandReturnValue.True);
         }
     }
 }

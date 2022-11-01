@@ -79,7 +79,8 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Attributes\CommandAttribute.cs" />
+    <Compile Include="EmmController\ChecksumType.cs" />
+    <Compile Include="EmmController\CommandAttribute.cs" />
     <Compile Include="Communication\MyBLE\MyBLE.cs" />
     <Compile Include="Communication\ICommunication.cs" />
     <Compile Include="Communication\MyBLE\MyBLE_ConnectDeviceAndSettingWindow.xaml.cs">
