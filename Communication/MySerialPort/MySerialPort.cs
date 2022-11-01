@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.IO.Ports;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 
@@ -13,6 +15,10 @@ namespace MyEmmControl.Communication
         public SerialPort serialPort;
 
         public event EventHandler<byte[]> OnRecvdData;
+
+        private bool getFlag = false;
+
+        private List<byte> _data = new List<byte>();
 
         public MySerialPort()
         {
@@ -26,7 +32,15 @@ namespace MyEmmControl.Communication
 
             serialPort.Read(result, 0, serialPort.BytesToRead);
 
-            OnRecvdData?.Invoke(sender, result);
+            if (!getFlag)
+            {
+                OnRecvdData?.Invoke(sender, result);
+            }
+            else
+            {
+                _data.Clear();
+                _data.AddRange(result);
+            }
         }
 
         public bool? ConnectDeviceAndSettingWindow(Window owner)
@@ -54,6 +68,27 @@ namespace MyEmmControl.Communication
             //参数2：参数中从零开始的字节偏移量，从此处开始将字节复制到端口。
             //参数3：要写入的字节数。 
             serialPort.Write(data, 0, data.Length);
+        }
+
+        public byte[] Get(byte[] data)
+        {
+            getFlag = true;
+            Send(data);
+
+            DateTime _sendTime = DateTime.Now;
+            while (_data.Count <= 0)
+            {
+                Thread.Sleep(1);
+                if (DateTime.Now.Subtract(_sendTime).TotalSeconds > 5)
+                {
+                    throw new Exception("串口设备未响应");
+                }
+            }
+
+            byte[] result = new byte[_data.Count];
+            _data.CopyTo(result);
+            getFlag = false;
+            return result.ToArray();
         }
 
         /// <summary>

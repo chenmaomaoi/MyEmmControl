@@ -33,15 +33,21 @@ namespace MyEmmControl.View
             {
                 combo_Direction.Items.Add(item.ToString());
             }
+
+            if (combo_Direction.Items.Count > 0)
+            {
+                combo_Direction.SelectedIndex = 0;
+            }
         }
 
         private void btn_CalibrationEncoder_Click(object sender, RoutedEventArgs e)
         {
-            controller.SendCommand(EnumCommandHead.CalibrationEncoder);
+            controller.SendCommand(EnumCommandHead.CalibrationEncoder, out _);
         }
 
         private void btn_ConnectDevice_Click(object sender, RoutedEventArgs e)
         {
+            //todo:判断是否连接成功。
             new SelectCommunicationMode_Window().ShowDialog();
         }
 
@@ -52,7 +58,7 @@ namespace MyEmmControl.View
             v.Speed = Convert.ToUInt16(text_Speed.Text);
             v.Acceleration = Convert.ToByte(text_Acceleration.Text);
 
-            controller.SendCommand(EnumCommandHead.SetRotation, v);
+            controller.SendCommand(EnumCommandHead.SetRotation, out _, v);
         }
     }
 }

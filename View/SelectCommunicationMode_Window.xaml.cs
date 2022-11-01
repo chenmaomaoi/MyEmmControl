@@ -35,6 +35,11 @@ namespace MyEmmControl.View
                     prefix = v.Namespace + '.';
                 }
             }
+            if (cbx_CommunicationType.Items.Count > 0)
+            {
+                cbx_CommunicationType.SelectedIndex = 0;
+            }
+
         }
 
         private void btn_Ok_Click(object sender, RoutedEventArgs e)

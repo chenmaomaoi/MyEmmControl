@@ -1,6 +1,9 @@
 ﻿using Cysharp.Threading.Tasks;
+using SharpDX;
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using Windows.Devices.Bluetooth;
@@ -93,6 +96,10 @@ namespace MyEmmControl.Communication
 
         private DeviceWatcher watcher { get; set; }
 
+        private bool getFlag = false;
+
+        private List<byte> _data = new List<byte>();
+
         #region 公开方法
         public MyBLE(string serviceGuid = "0000ffe0-0000-1000-8000-00805f9b34fb",
                      string writeCharacteristicGuid = "0000ffe1-0000-1000-8000-00805f9b34fb",
@@ -171,6 +178,27 @@ namespace MyEmmControl.Communication
                 Task.Run(() => CurrentWriteCharacteristic.WriteValueAsync(CryptographicBuffer.CreateFromByteArray(data),
                                                                           GattWriteOption.WriteWithResponse));
             }
+        }
+
+        public byte[] Get(byte[] data)
+        {
+            getFlag = true;
+            Send(data);
+
+            DateTime _sendTime = DateTime.Now;
+            while (_data.Count <= 0)
+            {
+                Thread.Sleep(1);
+                if (DateTime.Now.Subtract(_sendTime).TotalSeconds > 5)
+                {
+                    throw new Exception("低功耗蓝夜设备未响应");
+                }
+            }
+
+            byte[] result = new byte[_data.Count];
+            _data.CopyTo(result);
+            getFlag = false;
+            return result.ToArray();
         }
 
         public bool? ConnectDeviceAndSettingWindow(Window owner)
@@ -311,7 +339,16 @@ namespace MyEmmControl.Communication
         {
             CryptographicBuffer.CopyToByteArray(args.CharacteristicValue, out byte[] data);
             await UniTask.SwitchToThreadPool();
-            OnRecvdData?.Invoke(sender, data);
+
+            if (!getFlag)
+            {
+                OnRecvdData?.Invoke(sender, data);
+            }
+            else
+            {
+                _data.Clear();
+                _data.AddRange(data);
+            }
         }
 
         /// <summary>

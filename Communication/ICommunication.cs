@@ -26,5 +26,13 @@ namespace MyEmmControl.Communication
         /// 收到数据
         /// </summary>
         event EventHandler<byte[]> OnRecvdData;
+
+        /// <summary>
+        /// Get数据
+        /// </summary>
+        /// <param name="data"></param>
+        /// <remarks>超时时间：5秒</remarks>
+        /// <returns></returns>
+        byte[] Get(byte[] data);
     }
 }

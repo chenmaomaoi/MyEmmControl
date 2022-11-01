@@ -1,8 +1,8 @@
 ﻿using MyEmmControl.Attributes;
 using MyEmmControl.Communication;
 using System;
+using System.Collections.Generic;
 using System.Linq;
-using Windows.Foundation;
 
 namespace MyEmmControl.EmmController
 {
@@ -15,7 +15,7 @@ namespace MyEmmControl.EmmController
         /// 0为广播地址<para/>
         /// 1-247为设备地址<para/>
         /// </remarks>
-        public byte[] UARTAddr { get; set; } = { 0x01 };
+        public byte UARTAddr { get; private set; } = 0x01;
 
         /// <summary>
         /// 编码器值
@@ -76,44 +76,66 @@ namespace MyEmmControl.EmmController
         /// <summary>
         /// 指令头
         /// </summary>
-        private EnumCommandHead cmdHead { get; set; }
+        private EnumCommandHead _cmdHead { get; set; }
 
         /// <summary>
         /// 指令体
         /// </summary>
         /// <remarks>读取型指令没有指令体</remarks>
-        private CommandBody cmdBody { get; set; }
+        private CommandBody _cmdBody { get; set; }
 
         /// <summary>
         /// 检验字节
         /// </summary>
         /// <remarks>通过校验或者返回固定的0x6B</remarks>
-        private byte[] dataCheck { get; set; } = { 0x6B };
+        private byte[] _dataCheck { get; set; } = { 0x6B };
 
-        private ICommunication communication;
+        private ICommunication _communication;
 
-        private event EventHandler<byte[]> recvdData;
+        /// <summary>
+        /// 位置运动模式结束-到达指定位置
+        /// </summary>
+        public event EventHandler EventSetPositionDone;
 
         public Controller(ICommunication communication)
         {
-            this.communication = communication;
-            this.communication.OnRecvdData += (object sender, byte[] e) =>
-                {
-                    if (e.Length > 2 && e[0] == UARTAddr[0])
-                    {
-                        //todo:校验数据
-                        //固定结尾0x6B校验
-                        if (e[e.Length - 1] != 0x6B) return;
+            this._communication = communication;
 
-                        //掐头去尾
-                        byte[] _data = new byte[e.Length - 2];
-                        for (int i = 1; i < e.Length - 1; i++)
-                        {
-                            _data[i - 1] = e[i];
-                        }
-                        recvdData?.Invoke(sender, e);
+            //非Get模式收到数据
+            this._communication.OnRecvdData += (object sender, byte[] e) =>
+                {
+                    byte[] dat = DataFilter(e);
+                    if (dat.Length == 1 && dat[0] == EnumCommandReturn.PcmdRet)
+                    {
+                        //角度转动模式结束
+                        EventSetPositionDone?.Invoke(sender,new EventArgs());
                     }
                 };
+        }
+
+        /// <summary>
+        /// 数据处理与校验
+        /// </summary>
+        /// <param name="data"></param>
+        /// <returns></returns>
+        private byte[] DataFilter(byte[] data)
+        {
+            if (data.Length > 2 && data[0] == UARTAddr)
+            {
+                //todo:校验数据
+                //固定结尾0x6B校验
+                if (data[data.Length - 1] != 0x6B) return null;
+
+                //掐头去尾
+                byte[] ndata = new byte[data.Length - 2];
+                for (int i = 1; i < data.Length - 1; i++)
+                {
+                    ndata[i - 1] = data[i];
+                }
+
+                return ndata;
+            }
+            return null;
         }
 
         /// <summary>
@@ -121,282 +143,211 @@ namespace MyEmmControl.EmmController
         /// </summary>
         /// <param name="cmdhead"></param>
         /// <param name="cmdbody"></param>
-        public void SendCommand(EnumCommandHead cmdhead, CommandBody cmdbody = null)
+        public string SendCommand(EnumCommandHead cmdhead, CommandBody cmdbody = null)
         {
-            cmdHead = cmdhead;
-            cmdBody = cmdbody;
+            _cmdHead = cmdhead;
+            _cmdBody = cmdbody;
 
             //取命令
-            var _headattr = cmdhead.GetAttribute<CommandAttribute>();
-            byte[] _head = _headattr.Command;
+            var headattr = cmdhead.GetAttribute<CommandAttribute>();
+            byte[] head = headattr.Command;
 
             //拼接命令
-            byte[] _cmd = (cmdBody == null)
-                       ? UARTAddr.Concat(_head).Concat(dataCheck).ToArray()
-                       : UARTAddr.Concat(_head).Concat(cmdBody.GetCommandBody()).Concat(dataCheck).ToArray();
+            byte[] _cmd = (_cmdBody == null)
+                       ? new byte[] { UARTAddr }.Concat(head).Concat(_dataCheck).ToArray()
+                       : new byte[] { UARTAddr }.Concat(head).Concat(_cmdBody.GetCommandBody()).Concat(_dataCheck).ToArray();
+
+
+            //倒序
+            List<byte> uartMessgae = DataFilter(_communication.Get(_cmd)).Reverse().ToList();
 
             //绑定返回处理
-            typeof(Controller).GetMethod(cmdhead.ToString())?.Invoke(this, null);
+            object result = typeof(Controller).GetMethod(cmdhead.ToString())?.Invoke(this, uartMessgae.ConvertAll(v => (object)v).ToArray());
 
-            communication.Send(_cmd);
+            return result.ToString();
+            //communication.Send(_cmd);
+
+            //处理返回结果
+
         }
 
         /// <summary>
         /// 编码器校准
         /// </summary>
         /// <remarks>什么都不做，等待就行了</remarks>
-        private void CalibrationEncoder() => recvdData += commonRecv;
+        private bool CalibrationEncoder(byte[] e) => convertRecvCommonAndState(e);
 
         /// <summary>
         /// 设置当前位置为零点
         /// </summary>
-        private void SetInitiationPoint() => recvdData += commonRecv;
+        /// <remarks>什么都不做，等待就行了</remarks>
+        private bool SetInitiationPoint(byte[] e) => convertRecvCommonAndState(e);
 
         /// <summary>
         /// 解除堵转保护
         /// </summary>
-        private void ResetBlockageProtection()
+        /// <returns>接触堵转保护成功为true</returns>
+        private bool ResetBlockageProtection(byte[] e)
         {
-            recvdData += recv;
-            void recv(object sender, byte[] e)
-            {
-                if (e.Length == 1)
-                {
-                    bool _result = e[0] == EnumCommandReturn.CommandOK;
-                    if (_result) BlockageProtectionState = false;
-                    OnComplete?.Invoke(cmdHead, new EventResultArgs() { Success = _result });
-                }
-                else
-                {
-                    throw new ArgumentOutOfRangeException();
-                }
-                recvdData -= recv;
-            }
+            bool result = convertRecvCommonAndState(e);
+            if (result) this.BlockageProtectionState = false;
+            return result;
         }
 
         /// <summary>
         /// 读取编码器值
         /// </summary>
-        private void ReadEncoderValue()
+        private ushort ReadEncoderValue(byte[] e)
         {
-            recvdData += recv;
-            void recv(object sender, byte[] e)
-            {
-                if (e.Length == 2)
-                {
-                    UInt16 _result = ((ushort)((UInt16)e[1] << 8 | (UInt16)e[0]));
-                    this.EncoderValue = _result;
-                    OnComplete?.Invoke(cmdHead, new EventResultArgs() { Success = true, Message = _result.ToString() });
-                }
-                else
-                {
-                    throw new ArgumentOutOfRangeException(nameof(cmdHead));
-                }
-                recvdData -= recv;
-            }
+            if (e.Length != 2) throw new ArgumentOutOfRangeException(nameof(e));
+            this.EncoderValue = (ushort)convertRecvInt32(e);
+            return this.EncoderValue;
         }
 
         /// <summary>
         /// 读取脉冲数
         /// </summary>
-        private void ReadPulsCount() => recvdData += int32Recv;
+        private int ReadPulsCount(byte[] e)
+        {
+            if (e.Length != 4) throw new ArgumentOutOfRangeException(nameof(e));
+            this.PulsCount = convertRecvInt32(e);
+            return this.PulsCount;
+        }
 
         /// <summary>
         /// 读取电机实时位置
         /// </summary>
-        private void ReadMotorPosition() => recvdData += int32Recv;
+        private int ReadMotorPosition(byte[] e)
+        {
+            if (e.Length != 4) throw new ArgumentOutOfRangeException(nameof(e));
+            this.MotorPosition = convertRecvInt32(e);
+            return this.MotorPosition;
+        }
 
         /// <summary>
         /// 读取位置误差
         /// </summary>
-        private void ReadPositionError()
+        private short ReadPositionError(byte[] e)
         {
-            recvdData += recv;
-            void recv(object sender, byte[] e)
-            {
-                if (e.Length == 2)
-                {
-                    Int16 _result = (short)((Int16)e[1] << 8 | (Int16)e[0]);
-                    this.PositionError = _result;
-                    OnComplete?.Invoke(cmdHead, new EventResultArgs() { Success = true, Message = _result.ToString() });
-                }
-                else
-                {
-                    throw new ArgumentOutOfRangeException(nameof(cmdHead));
-                }
-                recvdData -= recv;
-            }
+            if (e.Length != 2) throw new ArgumentOutOfRangeException(nameof(e));
+            this.PositionError = convertRecvInt16(e);
+            return this.PositionError;
         }
 
         /// <summary>
         /// 读取驱动板使能状态
         /// </summary>
-        private void IsEnable() => recvdData += stateRecv;
+        private bool IsEnable(byte[] e)
+        {
+            this.BoardIsEnable = convertRecvCommonAndState(e);
+            return this.BoardIsEnable;
+        }
 
         /// <summary>
         /// 读取堵转状态
         /// </summary>
-        private void ReadBlockageProtectionState() => recvdData += stateRecv;
+        private bool ReadBlockageProtectionState(byte[] e)
+        {
+            this.BlockageProtectionState = convertRecvCommonAndState(e);
+            return this.BlockageProtectionState;
+        }
 
         /// <summary>
         /// 读取单圈上电回零状态
         /// </summary>
-        private void ReadInitiationState() => recvdData += stateRecv;
+        private bool ReadInitiationState(byte[] e)
+        {
+            bool result = convertRecvCommonAndState(e);
+            this.InitiationState = !result;
+            return result;
+        }
 
         /// <summary>
         /// 修改细分步数
         /// </summary>
-        private void UpdateSubdivision() => recvdData += commonRecv;
+        private bool UpdateSubdivision(byte[] e)
+        {
+            bool result = convertRecvCommonAndState(e);
+            if (result) this.Subdivision = (byte)_cmdBody.Data;
+            return result;
+        }
 
         /// <summary>
         /// 修改串口通讯地址
         /// </summary>
-        private void UpdateUARTAddr() => recvdData += commonRecv;
+        private bool UpdateUARTAddr(byte[] e)
+        {
+            bool result = convertRecvCommonAndState(e);
+            if (result) this.UARTAddr = (byte)_cmdBody.Data;
+            return result;
+        }
 
         /// <summary>
         /// 使能驱动板
         /// </summary>
-        private void Enable() => recvdData += commonRecv;
-        private void Disable() => recvdData += commonRecv;
+        private bool Enable(byte[] e)
+        {
+            bool result = convertRecvCommonAndState(e);
+            if (result) this.BoardIsEnable = true;
+            return result;
+        }
+        private bool Disable(byte[] e)
+        {
+            bool result = convertRecvCommonAndState(e);
+            if (result) this.BoardIsEnable = false;
+            return result;
+        }
 
         /// <summary>
         /// 控制电机转动
         /// </summary>
-        private void SetRotation() => recvdData += commonRecv;
+        private bool SetRotation(byte[] e)
+        {
+            bool result = convertRecvCommonAndState(e);
+            if (result) this.RotationCurrent = _cmdBody;
+            return result;
+        }
 
         /// <summary>
         /// 存储电机正反转参数
         /// </summary>
-        private void StoreRotation() => recvdData += commonRecv;
+        private bool StoreRotation(byte[] e)
+        {
+            bool result = convertRecvCommonAndState(e);
+            if (result) this.RotationMemory = this.RotationCurrent;
+            return result;
+        }
 
         /// <summary>
         /// 清除电机正反转参数
         /// </summary>
-        private void RestoreRotation() => recvdData += commonRecv;
+        private bool RestoreRotation(byte[] e)
+        {
+            bool result = convertRecvCommonAndState(e);
+            if (result) this.RotationMemory = null;
+            return result;
+        }
 
         /// <summary>
         /// 控制电机转动
         /// </summary>
-        private void SetPosition()
+        private bool SetPosition(byte[] e) => convertRecvCommonAndState(e);
+
+        private short convertRecvInt16(byte[] e)
         {
-            recvdData += recv1;
-
-            void recv1(object sender, byte[] e)
-            {
-                if (e.Length == 1)
-                {
-                    bool _result = e[0] == EnumCommandReturn.CommandOK;
-                }
-                else
-                {
-                    throw new ArgumentOutOfRangeException();
-                }
-                recvdData -= recv1;
-                recvdData += recv2;
-            }
-
-            void recv2(object sender, byte[] e)
-            {
-                if (e.Length == 1)
-                {
-                    bool _result = e[0] == EnumCommandReturn.PcmdRet;
-
-                    OnComplete?.Invoke(cmdHead, new EventResultArgs() { Success = _result, Message = cmdBody.ToString() });
-                }
-                else
-                {
-                    throw new ArgumentOutOfRangeException();
-                }
-                recvdData -= recv2;
-            }
+            if (e.Length != 2) throw new ArgumentOutOfRangeException(nameof(e));
+            return BitConverter.ToInt16(e, 0);
         }
 
-        private void int32Recv(object sender, byte[] e)
+        private int convertRecvInt32(byte[] e)
         {
-            if (e.Length == 4)
-            {
-                Int32 _result = (Int32)e[3] << 24 |
-                                (Int32)e[2] << 16 |
-                                (Int32)e[1] << 8 |
-                                (Int32)e[0];
-                switch (cmdHead)
-                {
-                    case EnumCommandHead.ReadPulsCount: this.PulsCount = _result; break;
-                    case EnumCommandHead.ReadMotorPosition: this.MotorPosition = _result; break;
-
-                    default: throw new ArgumentOutOfRangeException(nameof(cmdHead));
-                }
-
-                this.PulsCount = _result;
-                OnComplete?.Invoke(cmdHead, new EventResultArgs() { Success = true, Message = _result.ToString() });
-            }
-            else
-            {
-                throw new ArgumentOutOfRangeException();
-            }
-            recvdData -= int32Recv;
+            return BitConverter.ToInt32(e, 0);
         }
 
-
-        private void stateRecv(object sender, byte[] e)
+        private bool convertRecvCommonAndState(byte[] e)
         {
-            if (e.Length == 1)
-            {
-                bool _result = e[0] == EnumCommandReturn.True;
-                switch (cmdHead)
-                {
-                    case EnumCommandHead.IsEnable: this.BoardIsEnable = _result; break;
-                    case EnumCommandHead.ReadBlockageProtectionState: this.BlockageProtectionState = _result; break;
-                    case EnumCommandHead.ReadInitiationState: this.InitiationState = !_result; break;
-
-                    default: throw new ArgumentOutOfRangeException(nameof(cmdHead));
-                }
-
-                OnComplete?.Invoke(cmdHead, new EventResultArgs() { Success = _result });
-            }
-            else
-            {
-                throw new ArgumentOutOfRangeException();
-            }
-            recvdData -= stateRecv;
+            if (e.Length != 1) throw new ArgumentOutOfRangeException(nameof(e));
+            return (e[0] == EnumCommandReturn.CommandOK) || (e[0] == EnumCommandReturn.True);
         }
-
-        private void commonRecv(object sender, byte[] e)
-        {
-            if (e.Length == 1)
-            {
-                bool _result = e[0] == EnumCommandReturn.CommandOK;
-                byte[] _cmdbody = cmdBody.GetCommandBody();
-                switch (cmdHead)
-                {
-                    case EnumCommandHead.CalibrationEncoder: break;
-                    case EnumCommandHead.SetInitiationPoint: break;
-                    case EnumCommandHead.UpdateSubdivision: if (_result && _cmdbody.Length == 1) this.Subdivision = _cmdbody[0]; break;
-                    case EnumCommandHead.UpdateUARTAddr: if (_result && _cmdbody.Length == 1) this.UARTAddr = new byte[] { _cmdbody[0] }; break;
-                    case EnumCommandHead.Enable: if (_result) this.BoardIsEnable = true; break;
-                    case EnumCommandHead.Disable: if (_result) this.BoardIsEnable = false; break;
-                    case EnumCommandHead.SetRotation: if (_result) this.RotationCurrent = cmdBody; break;
-                    case EnumCommandHead.StoreRotation: if (_result) this.RotationMemory = this.RotationCurrent; break;
-                    case EnumCommandHead.RestoreRotation: if (_result) this.RotationMemory = null; break;
-
-                    default: throw new ArgumentOutOfRangeException(nameof(cmdHead));
-                }
-
-                OnComplete?.Invoke(cmdHead, new EventResultArgs() { Success = _result, Message = cmdBody.ToString() });
-            }
-            else
-            {
-                throw new ArgumentOutOfRangeException();
-            }
-            recvdData -= commonRecv;
-        }
-
-        public event TypedEventHandler<EnumCommandHead, EventResultArgs> OnComplete;
-    }
-
-    public class EventResultArgs
-    {
-        public bool Success { get; set; }
-        public string Message { get; set; }
     }
 }
