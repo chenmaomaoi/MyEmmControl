@@ -42,7 +42,7 @@ namespace MyEmmControl.View
 
         private void btn_CalibrationEncoder_Click(object sender, RoutedEventArgs e)
         {
-            controller.SendCommand(EnumCommandHead.CalibrationEncoder, out _);
+            controller.SendCommand(EnumCommandHead.CalibrationEncoder);
         }
 
         private void btn_ConnectDevice_Click(object sender, RoutedEventArgs e)
@@ -58,7 +58,7 @@ namespace MyEmmControl.View
             v.Speed = Convert.ToUInt16(text_Speed.Text);
             v.Acceleration = Convert.ToByte(text_Acceleration.Text);
 
-            controller.SendCommand(EnumCommandHead.SetRotation, out _, v);
+            controller.SendCommand(EnumCommandHead.SetRotation, v);
         }
     }
 }
