@@ -12,11 +12,10 @@ namespace MyEmmControl.Attributes
         /// <param name="obj"></param>
         /// <param name="attributeType">typeof(TAtteibute)</param>
         /// <returns></returns>
-        public static TAtteibute GetAttribute<TAtteibute>(this object obj, Type attributeType) where TAtteibute : Attribute
+        public static TAtteibute GetFieldAttribute<TAtteibute>(this object obj, Type attributeType) where TAtteibute : Attribute
         {
-            Type type = obj.GetType();
             //获取字段信息
-            FieldInfo field = type.GetField(obj.ToString());
+            FieldInfo field = obj.GetType().GetField(obj.ToString());
             //检查字段是否含有指定特性
             if (field.IsDefined(attributeType, true))
             {
@@ -37,9 +36,9 @@ namespace MyEmmControl.Attributes
         /// <param name="obj"></param>
         /// <remarks>在迭代器中该方法可能带来性能损失</remarks>
         /// <returns></returns>
-        public static TAtteibute GetAttribute<TAtteibute>(this object obj) where TAtteibute : Attribute
+        public static TAtteibute GetFieldAttribute<TAtteibute>(this object obj) where TAtteibute : Attribute
         {
-            return GetAttribute<TAtteibute>(obj, typeof(TAtteibute));
+            return GetFieldAttribute<TAtteibute>(obj, typeof(TAtteibute));
         }
     }
 }

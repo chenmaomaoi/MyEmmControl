@@ -1,5 +1,7 @@
-﻿using System;
+﻿using MyEmmControl.Attributes;
+using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -21,16 +23,17 @@ namespace MyEmmControl.View
     {
         public EmmController controller;
 
+        Dictionary<string, DirectionOfRotation> directionOfRoatationNames = new Dictionary<string, DirectionOfRotation>();
+
         public MainWindow()
         {
             InitializeComponent();
 
-            var ty = typeof(DirectionOfRotation);
-            ty.GetEnumValues();
-
-            foreach (var item in ty.GetEnumValues())
+            foreach (var item in typeof(DirectionOfRotation).GetEnumValues())
             {
-                combo_Direction.Items.Add(item.ToString());
+                string description = item.GetFieldAttribute<DescriptionAttribute>().Description;
+                directionOfRoatationNames.Add(description, (DirectionOfRotation)item);
+                combo_Direction.Items.Add(description);
             }
 
             if (combo_Direction.Items.Count > 0)
@@ -52,12 +55,15 @@ namespace MyEmmControl.View
 
         private void btn_Send_Click(object sender, RoutedEventArgs e)
         {
-            var v = new CommandBody();
-            v.Direction = (DirectionOfRotation)Enum.Parse(typeof(DirectionOfRotation), combo_Direction.SelectedItem.ToString());
-            v.Speed = Convert.ToUInt16(text_Speed.Text);
-            v.Acceleration = Convert.ToByte(text_Acceleration.Text);
+            directionOfRoatationNames.TryGetValue(combo_Direction.SelectedItem.ToString(), out var directionOfRotation);
 
-            controller.SendCommand(CommandHeads.SetRotation, v);
+            CommandBody cmdBody = new CommandBody
+            {
+                Direction = directionOfRotation,
+                Speed = Convert.ToUInt16(text_Speed.Text),
+                Acceleration = Convert.ToByte(text_Acceleration.Text)
+            };
+            controller.SendCommand(CommandHeads.SetRotation, cmdBody);
         }
     }
 }

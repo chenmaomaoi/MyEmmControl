@@ -6,20 +6,144 @@
         xmlns:input="clr-namespace:System.Windows.Input;assembly=PresentationCore"
         xmlns:local="clr-namespace:MyEmmControl.View"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
-    <Grid>
-        <Button x:Name="btn_CalibrationEncoder" Content="校准" HorizontalAlignment="Left" Margin="168,26,0,0" VerticalAlignment="Top" Click="btn_CalibrationEncoder_Click"/>
-        <Button x:Name="btn_ConnectDevice" Content="连接设备" HorizontalAlignment="Left" Margin="46,21,0,0" VerticalAlignment="Top" Click="btn_ConnectDevice_Click"/>
-        <Button x:Name="btn_Send" Content="发送" HorizontalAlignment="Left" Margin="182,83,0,0" VerticalAlignment="Top" Click="btn_Send_Click"/>
-        <ComboBox x:Name="combo_Direction" HorizontalAlignment="Left" Margin="46,82,0,0" VerticalAlignment="Top" Width="120"/>
-        <TextBox x:Name="text_Speed" input:InputMethod.IsInputMethodEnabled="False"  HorizontalAlignment="Left" Margin="122,127,0,0" TextWrapping="Wrap" Text="{Binding ElementName=slider_Speed, Path=Value}" VerticalAlignment="Top" Width="120" />
-        <TextBox x:Name="text_Acceleration" HorizontalAlignment="Left" Margin="122,192,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="120"/>
-        <Slider Name="slider_Speed" HorizontalAlignment="Center" Margin="0,126,0,0" VerticalAlignment="Top" Width="281" Maximum="1279" Value="230"/>
-        <RadioButton Content="百分比" HorizontalAlignment="Left" Margin="46,120,0,0" VerticalAlignment="Top"/>
-        <RadioButton Content="绝对值" HorizontalAlignment="Left" Margin="46,139,0,0" VerticalAlignment="Top"/>
+        Title="MainWindow"
+        Height="318"
+        Width="550">
+
+    <Grid Margin="5">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="1*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <Grid Grid.Row="0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="1*"/>
+                </Grid.ColumnDefinitions>
+
+                <Grid Grid.Column="0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="1*"/>
+                    </Grid.RowDefinitions>
+
+                    <Button x:Name="btn_ConnectDevice"
+                            Grid.Column="0"
+                            Margin="5"
+                            Content="连接设备"
+                            HorizontalAlignment="Left"
+                            VerticalAlignment="Top"
+                            Click="btn_ConnectDevice_Click"/>
+
+                    <!--设备控制区-->
+                    <Grid x:Name="grid_Content"
+                      IsEnabled="True"
+                      Margin="5"
+                      Grid.Row="1">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="1*"/>
+                        </Grid.RowDefinitions>
+                        <Button x:Name="btn_CalibrationEncoder"
+                        Content="校准"
+                        HorizontalAlignment="Center"
+                        Margin="0,71,0,0"
+                        VerticalAlignment="Top"
+                        Click="btn_CalibrationEncoder_Click" Grid.Row="1"/>
+
+                    </Grid>
+                </Grid>
+
+                <!--运动控制区-->
+                <Grid IsEnabled="{Binding IsEnabled, ElementName=grid_Content}"
+                      Margin="5"
+                      Grid.Column="1">
+
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="1*"/>
+                    </Grid.RowDefinitions>
+
+                    <Grid Grid.Row="0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="1*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <Grid Grid.Column="0">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            <RadioButton Content="百分比"
+                                         Margin="0,0,0,2"
+                                         Grid.Row="0"
+                                         HorizontalAlignment="Left"
+                                         VerticalAlignment="Top"/>
+                            <RadioButton Content="绝对值"
+                                         Margin="0,0,2,0"
+                                         Grid.Row="1"
+                                         HorizontalAlignment="Left"
+                                         VerticalAlignment="Top"/>
+                        </Grid>
+
+                        <ComboBox x:Name="combo_Direction"
+                              Grid.Column="1"
+                              HorizontalAlignment="Left"
+                              VerticalAlignment="Center"
+                              MinWidth="50"
+                              Margin="5"/>
+                    </Grid>
+
+                    <!--速度-->
+                    <Grid Grid.Row="1" Margin="5">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="1*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <TextBox x:Name="text_Speed"
+                                     Grid.Column="0"
+                                     InputMethod.IsInputMethodEnabled="False"
+                                     HorizontalAlignment="Center"
+                                     TextWrapping="Wrap"
+                                     Text="{Binding Value, ElementName=slider_Speed}"
+                                     VerticalAlignment="Center"
+                                     MinWidth="40"/>
+
+                            <Slider x:Name="slider_Speed"
+                                    Grid.Column="2"
+                                    Maximum="1279"
+                                    Value="230"
+                                    VerticalAlignment="Center"/>
+                        </Grid>
+                    </Grid>
 
 
+                    <Button x:Name="btn_Send"
+                            Grid.Row="5"
+                            Margin="5"
+                            Content="发送"
+                            HorizontalAlignment="Right"
+                            VerticalAlignment="Bottom"
+                            Click="btn_Send_Click"/>
+                </Grid>
+            </Grid>
+
+            <!--日志区-->
+            <Grid Grid.Row="1"
+                  Margin="5">
+                <TextBlock>
 
 
+                </TextBlock>
+            </Grid>
+        </Grid>
     </Grid>
 </Window>

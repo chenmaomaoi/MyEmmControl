@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Net.NetworkInformation;
 using System.Reflection;
@@ -7,6 +8,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using MyEmmControl.Attributes;
 using MyEmmControl.Communication;
 using SharpDX.Text;
 using Windows.Devices.Enumeration;
@@ -18,7 +20,7 @@ namespace MyEmmControl.View
     /// </summary>
     public partial class SelectCommunicationMode_Window : Window
     {
-        private string prefix = null;
+        private Dictionary<string, Type> communicationNames = new Dictionary<string, Type>();
 
         public SelectCommunicationMode_Window()
         {
@@ -27,31 +29,28 @@ namespace MyEmmControl.View
             var types = AppDomain.CurrentDomain.GetAssemblies()
                     .SelectMany(a => a.GetTypes().Where(t => t.GetInterfaces().Contains(typeof(ICommunication))))
                     .ToArray();
-            foreach (var v in types)
+            foreach (Type type in types)
             {
-                cbx_CommunicationType.Items.Add(v.Name);
-                if (string.IsNullOrEmpty(prefix))
-                {
-                    prefix = v.Namespace + '.';
-                }
+                string description = type.GetCustomAttribute<DescriptionAttribute>().Description;
+                communicationNames.Add(description, type);
+                cbx_CommunicationType.Items.Add(description);
             }
+
             if (cbx_CommunicationType.Items.Count > 0)
             {
                 cbx_CommunicationType.SelectedIndex = 0;
             }
-
         }
 
         private void btn_Ok_Click(object sender, RoutedEventArgs e)
         {
             string typeName = cbx_CommunicationType.SelectedItem.ToString();
-            Type type = Type.GetType(prefix + typeName);
-            ICommunication communication = (ICommunication)Activator.CreateInstance(type);
-
+            communicationNames.TryGetValue(typeName, out Type communicationType);
+            ICommunication communication = (ICommunication)Activator.CreateInstance(communicationType);
             bool res = (bool)communication.ConnectDeviceAndSettingWindow(this);
             if (res)
             {
-                App.MainWindow.controller = new EmmController.Controller(communication);
+                App.MainWindow.controller = new EmmController(communication);
 
                 this.Close();
             }

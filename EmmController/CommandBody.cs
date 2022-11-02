@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 
@@ -71,11 +72,13 @@ namespace MyEmmControl
         /// <summary>
         ///顺时针 clockwise
         /// </summary>
+        [Description("顺时针")]
         CW = 0x0000,
 
         /// <summary>
         /// 逆时针 counterclockwise
         /// </summary>
+        [Description("逆时针")]
         CCW = 0x1000
     }
 }

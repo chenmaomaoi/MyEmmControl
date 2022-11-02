@@ -141,7 +141,7 @@ namespace MyEmmControl.Communication
                     foreach (Button button in Buttons)
                     {
                         //遍历每个按钮，获取状态变化
-                        DescriptionAttribute att = button.Name.GetAttribute<DescriptionAttribute>(_attType);
+                        DescriptionAttribute att = button.Name.GetFieldAttribute<DescriptionAttribute>(_attType);
                         string name = att?.Description;
 
                         GamepadButtonFlags flag = (GamepadButtonFlags)Enum.Parse(_buttonFlagType, name);

@@ -171,7 +171,7 @@ namespace MyEmmControl
             _cmdBody = cmdbody;
 
             //取命令
-            var headattr = _cmdHead.GetAttribute<CommandAttribute>();
+            var headattr = _cmdHead.GetFieldAttribute<CommandAttribute>();
             byte[] head = headattr.Command;
 
             //拼接命令
@@ -189,12 +189,14 @@ namespace MyEmmControl
             switch (headattr.ReturnOperate)
             {
                 case CommandReturnOperateTypes.Value:
-                    PropertyInfo propertyInfo = typeof(EmmController).GetProperties().FirstOrDefault(x => x.GetAttribute<DescriptionAttribute>().Description == _cmdHead.ToString());
+                    PropertyInfo propertyInfo = typeof(EmmController).GetProperties().FirstOrDefault(x => x.GetFieldAttribute<DescriptionAttribute>().Description == _cmdHead.ToString());
                     propertyInfo?.SetValue(this, retValue);
                     break;
                 case CommandReturnOperateTypes.Other:
                     typeof(EmmController).GetMethod(_cmdHead.ToString())?.Invoke(this, retValue);
                     break;
+
+                case CommandReturnOperateTypes.No_Operation:
                 default:
                     break;
             }

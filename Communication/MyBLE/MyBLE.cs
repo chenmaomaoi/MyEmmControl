@@ -2,6 +2,7 @@
 using SharpDX;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -25,6 +26,7 @@ namespace MyEmmControl.Communication
         }
     }
 
+    [Description("低功耗蓝牙(BLE)")]
     public class MyBLE : ICommunication
     {
         #region 属性
