@@ -11,7 +11,6 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
-using MyEmmControl.EmmController;
 
 namespace MyEmmControl.View
 {
@@ -20,7 +19,7 @@ namespace MyEmmControl.View
     /// </summary>
     public partial class MainWindow : Window
     {
-        public Controller controller;
+        public EmmController controller;
 
         public MainWindow()
         {
@@ -42,7 +41,7 @@ namespace MyEmmControl.View
 
         private void btn_CalibrationEncoder_Click(object sender, RoutedEventArgs e)
         {
-            controller.SendCommand(CommandHead.CalibrationEncoder);
+            controller.SendCommand(CommandHeads.CalibrationEncoder);
         }
 
         private void btn_ConnectDevice_Click(object sender, RoutedEventArgs e)
@@ -58,7 +57,7 @@ namespace MyEmmControl.View
             v.Speed = Convert.ToUInt16(text_Speed.Text);
             v.Acceleration = Convert.ToByte(text_Acceleration.Text);
 
-            controller.SendCommand(CommandHead.SetRotation, v);
+            controller.SendCommand(CommandHeads.SetRotation, v);
         }
     }
 }

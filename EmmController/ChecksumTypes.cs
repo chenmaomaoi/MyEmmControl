@@ -4,9 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MyEmmControl.EmmController
+namespace MyEmmControl
 {
-    public enum ChecksumType
+    /// <summary>
+    /// 校验类型
+    /// </summary>
+    public enum ChecksumTypes
     {
         /// <summary>
         /// 固定值0x6B校验

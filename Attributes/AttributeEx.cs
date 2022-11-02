@@ -39,21 +39,7 @@ namespace MyEmmControl.Attributes
         /// <returns></returns>
         public static TAtteibute GetAttribute<TAtteibute>(this object obj) where TAtteibute : Attribute
         {
-            var attributeType = typeof(TAtteibute);
-            Type type = obj.GetType();
-            //获取字段信息
-            FieldInfo field = type.GetField(obj.ToString());
-            //检查字段是否含有指定特性
-            if (field.IsDefined(attributeType, true))
-            {
-                //获取字段上的自定义特性
-                TAtteibute remarkAttribute = (TAtteibute)field.GetCustomAttribute(attributeType);
-                return remarkAttribute;
-            }
-            else
-            {
-                return null;
-            }
+            return GetAttribute<TAtteibute>(obj, typeof(TAtteibute));
         }
     }
 }

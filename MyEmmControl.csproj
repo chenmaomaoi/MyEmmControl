@@ -79,7 +79,8 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="EmmController\ChecksumType.cs" />
+    <Compile Include="EmmController\Checksum.cs" />
+    <Compile Include="EmmController\ChecksumTypes.cs" />
     <Compile Include="EmmController\CommandAttribute.cs" />
     <Compile Include="Communication\MyBLE\MyBLE.cs" />
     <Compile Include="Communication\ICommunication.cs" />
@@ -96,9 +97,11 @@
     <Compile Include="Communication\MyXbox\StickValue.cs" />
     <Compile Include="Communication\MyXbox\MyXbox.cs" />
     <Compile Include="EmmController\CommandBody.cs" />
-    <Compile Include="EmmController\EnumCommandHead.cs" />
-    <Compile Include="EmmController\EnumCommandReturn.cs" />
-    <Compile Include="EmmController\Controller.cs" />
+    <Compile Include="EmmController\CommandReturnOperateTypes.cs" />
+    <Compile Include="EmmController\CommandReturnValues.cs" />
+    <Compile Include="EmmController\CommandHeads.cs" />
+    <Compile Include="EmmController\CommandReturnValueTypes.cs" />
+    <Compile Include="EmmController\EmmController.cs" />
     <Compile Include="View\MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
     </Compile>

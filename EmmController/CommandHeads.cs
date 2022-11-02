@@ -6,12 +6,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MyEmmControl.EmmController
+namespace MyEmmControl
 {
     /// <summary>
-    /// 枚举了控制命令头
+    /// 命令头
     /// </summary>
-    public enum CommandHead
+    public enum CommandHeads
     {
         #region 触发动作命令
         /// <summary>
@@ -19,7 +19,7 @@ namespace MyEmmControl.EmmController
         /// </summary>
         /// <remarks>无额外参数,通用返回</remarks>
         [Description("触发编码器校准")]
-        [Command(new byte[] { 0x06, 0x45 }, CommandReturnValueType.Bool)]
+        [Command(new byte[] { 0x06, 0x45 }, CommandReturnValueTypes.Bool, CommandReturnOperateTypes.No_Operation)]
         CalibrationEncoder,
 
         /// <summary>
@@ -27,7 +27,7 @@ namespace MyEmmControl.EmmController
         /// </summary>
         /// <remarks>无额外参数,通用返回</remarks>
         [Description("设置当前位置为零点")]
-        [Command(new byte[] { 0x0A, 0X6D }, CommandReturnValueType.Bool)]
+        [Command(new byte[] { 0x0A, 0X6D }, CommandReturnValueTypes.Bool, CommandReturnOperateTypes.No_Operation)]
         SetInitiationPoint,
 
         /// <summary>
@@ -35,7 +35,7 @@ namespace MyEmmControl.EmmController
         /// </summary>
         /// <remarks>无额外参数,通用返回</remarks>
         [Description("解除堵转保护")]
-        [Command(new byte[] { 0x0E, 0x52 }, CommandReturnValueType.Bool)]
+        [Command(new byte[] { 0x0E, 0x52 }, CommandReturnValueTypes.Bool, CommandReturnOperateTypes.Other)]
         ResetBlockageProtection,
         #endregion
 
@@ -45,7 +45,7 @@ namespace MyEmmControl.EmmController
         /// </summary>
         /// <remarks>无额外参数,返回编码器数值 uint16</remarks>
         [Description("读取编码器值")]
-        [Command(new byte[] { 0x30 }, CommandReturnValueType.UInt16)]
+        [Command(new byte[] { 0x30 }, CommandReturnValueTypes.UInt16, CommandReturnOperateTypes.Value)]
         ReadEncoderValue,
 
         /// <summary>
@@ -53,7 +53,7 @@ namespace MyEmmControl.EmmController
         /// </summary>
         /// <remarks>无额外参数,返回脉冲数 int32</remarks>
         [Description("读取脉冲数")]
-        [Command(new byte[] { 0x33 }, CommandReturnValueType.Int32)]
+        [Command(new byte[] { 0x33 }, CommandReturnValueTypes.Int32, CommandReturnOperateTypes.Value)]
         ReadPulsCount,
 
         /// <summary>
@@ -61,7 +61,7 @@ namespace MyEmmControl.EmmController
         /// </summary>
         /// <remarks>无额外参数,返回电机位置 int32</remarks>
         [Description("读取电机实时位置")]
-        [Command(new byte[] { 0x36 }, CommandReturnValueType.Int32)]
+        [Command(new byte[] { 0x36 }, CommandReturnValueTypes.Int32, CommandReturnOperateTypes.Value)]
         ReadMotorPosition,
 
         /// <summary>
@@ -69,7 +69,7 @@ namespace MyEmmControl.EmmController
         /// </summary>
         /// <remarks>无额外参数,返回位置误差 int16</remarks>
         [Description("读取位置误差")]
-        [Command(new byte[] { 0x36 }, CommandReturnValueType.Int16)]
+        [Command(new byte[] { 0x36 }, CommandReturnValueTypes.Int16, CommandReturnOperateTypes.Value)]
         ReadPositionError,
 
         /// <summary>
@@ -77,7 +77,7 @@ namespace MyEmmControl.EmmController
         /// </summary>
         /// <remarks>无额外参数,返回状态信息 byte=>bool</remarks>
         [Description("读取驱动板使能状态")]
-        [Command(new byte[] { 0x3A }, CommandReturnValueType.State)]
+        [Command(new byte[] { 0x3A }, CommandReturnValueTypes.State, CommandReturnOperateTypes.Value)]
         IsEnable,
 
         /// <summary>
@@ -89,7 +89,7 @@ namespace MyEmmControl.EmmController
         /// true:堵转
         /// </remarks>
         [Description("读取堵转状态")]
-        [Command(new byte[] { 0x3E }, CommandReturnValueType.State)]
+        [Command(new byte[] { 0x3E }, CommandReturnValueTypes.State, CommandReturnOperateTypes.Value)]
         ReadBlockageProtectionState,
 
         /// <summary>
@@ -101,7 +101,7 @@ namespace MyEmmControl.EmmController
         /// true:回零失败
         /// </remarks>
         [Description("读取单圈上电回零状态")]
-        [Command(new byte[] { 0x3A }, CommandReturnValueType.State)]
+        [Command(new byte[] { 0x3A }, CommandReturnValueTypes.State, CommandReturnOperateTypes.Value)]
         ReadInitiationState,
         #endregion
 
@@ -117,7 +117,7 @@ namespace MyEmmControl.EmmController
         /// 通用返回
         /// </remarks>
         [Description("修改细分步数")]
-        [Command(new byte[] { 0x84 }, CommandReturnValueType.Bool)]
+        [Command(new byte[] { 0x84 }, CommandReturnValueTypes.Bool, CommandReturnOperateTypes.Other)]
         UpdateSubdivision,
 
         /// <summary>
@@ -129,7 +129,7 @@ namespace MyEmmControl.EmmController
         /// 通用返回
         /// </remarks>
         [Description("修改串口通讯地址")]
-        [Command(new byte[] { 0xAE }, CommandReturnValueType.Bool)]
+        [Command(new byte[] { 0xAE }, CommandReturnValueTypes.Bool, CommandReturnOperateTypes.Other)]
         UpdateUARTAddr,
         #endregion
 
@@ -139,11 +139,11 @@ namespace MyEmmControl.EmmController
         /// </summary>
         /// <remarks>无额外参数,通用返回</remarks>
         [Description("使能驱动板")]
-        [Command(new byte[] { 0xF3, 0x01 }, CommandReturnValueType.Bool)]
+        [Command(new byte[] { 0xF3, 0x01 }, CommandReturnValueTypes.Bool, CommandReturnOperateTypes.Other)]
         Enable,
 
         [Description("关闭驱动板")]
-        [Command(new byte[] { 0xF3, 0x00 }, CommandReturnValueType.Bool)]
+        [Command(new byte[] { 0xF3, 0x00 }, CommandReturnValueTypes.Bool, CommandReturnOperateTypes.Other)]
         Disable,
 
         /// <summary>
@@ -159,7 +159,7 @@ namespace MyEmmControl.EmmController
         /// 通用返回
         /// </remarks>
         [Description("控制电机转动-速度模式")]
-        [Command(new byte[] { 0xF6 }, CommandReturnValueType.Bool)]
+        [Command(new byte[] { 0xF6 }, CommandReturnValueTypes.Bool, CommandReturnOperateTypes.Other)]
         SetRotation,
 
         /// <summary>
@@ -170,7 +170,7 @@ namespace MyEmmControl.EmmController
         /// 无额外参数,通用返回
         /// </remarks>
         [Description("存储转动参数")]
-        [Command(new byte[] { 0xFF, 0xC8 }, CommandReturnValueType.Bool)]
+        [Command(new byte[] { 0xFF, 0xC8 }, CommandReturnValueTypes.Bool, CommandReturnOperateTypes.Other)]
         StoreRotation,
 
         /// <summary>
@@ -178,7 +178,7 @@ namespace MyEmmControl.EmmController
         /// </summary>
         /// <remarks>无额外参数,通用返回</remarks>
         [Description("清除转动参数")]
-        [Command(new byte[] { 0xFF, 0xCA }, CommandReturnValueType.Bool)]
+        [Command(new byte[] { 0xFF, 0xCA }, CommandReturnValueTypes.Bool, CommandReturnOperateTypes.Other)]
         RestoreRotation,
 
         /// <summary>
@@ -195,7 +195,7 @@ namespace MyEmmControl.EmmController
         /// 指令和返回需要特殊处理
         /// </remarks>
         [Description("控制电机转动-位置模式")]
-        [Command(new byte[] { 0xFD }, CommandReturnValueType.Bool)]
+        [Command(new byte[] { 0xFD }, CommandReturnValueTypes.Bool, CommandReturnOperateTypes.No_Operation)]
         SetPosition
         #endregion
     }

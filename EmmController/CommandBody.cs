@@ -3,8 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace MyEmmControl.EmmController
+namespace MyEmmControl
 {
+    /// <summary>
+    /// 命令体所包含的信息
+    /// </summary>
     public class CommandBody
     {
         /// <summary>
@@ -60,7 +63,10 @@ namespace MyEmmControl.EmmController
         }
     }
 
-    public enum DirectionOfRotation : UInt16
+    /// <summary>
+    /// 电机转动方向
+    /// </summary>
+    public enum DirectionOfRotation : ushort
     {
         /// <summary>
         ///顺时针 clockwise

@@ -1,5 +1,4 @@
-﻿using MyEmmControl.EmmController;
-using System;
+﻿using System;
 using System.Reflection.Emit;
 
 namespace MyEmmControl
@@ -9,26 +8,29 @@ namespace MyEmmControl
     {
         public byte[] Command { get; set; }
 
-        public CommandReturnValueType ReturnValueType { get; set; }
+        public CommandReturnValueTypes ReturnValueType { get; set; }
 
-        public CommandAttribute(byte[] command, CommandReturnValueType returnValueType)
+        public CommandReturnOperateTypes ReturnOperate { get; set; }
+
+        public CommandAttribute(byte[] command, CommandReturnValueTypes returnValueType, CommandReturnOperateTypes returnOperate)
         {
             Command = command;
             ReturnValueType = returnValueType;
+            ReturnOperate = returnOperate;
         }
 
         public dynamic GetValue(byte[] e)
         {
             switch (ReturnValueType)
             {
-                case CommandReturnValueType.Bool:
-                case CommandReturnValueType.State:
+                case CommandReturnValueTypes.Bool:
+                case CommandReturnValueTypes.State:
                     if (e.Length != 1)
                         throw new ArgumentOutOfRangeException(nameof(e));
-                    return (e[0] == (byte)CommandReturnValue.CommandOK) || (e[0] == (byte)CommandReturnValue.True);
-                case CommandReturnValueType.Int16: return BitConverter.ToInt16(e, 0);
-                case CommandReturnValueType.UInt16: return BitConverter.ToUInt16(e, 0);
-                case CommandReturnValueType.Int32: return BitConverter.ToInt32(e, 0);
+                    return (e[0] == (byte)CommandReturnValues.CommandOK) || (e[0] == (byte)CommandReturnValues.True);
+                case CommandReturnValueTypes.Int16: return BitConverter.ToInt16(e, 0);
+                case CommandReturnValueTypes.UInt16: return BitConverter.ToUInt16(e, 0);
+                case CommandReturnValueTypes.Int32: return BitConverter.ToInt32(e, 0);
                 default: throw new ArgumentOutOfRangeException();
             }
         }
