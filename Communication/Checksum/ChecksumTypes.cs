@@ -1,10 +1,11 @@
-﻿using System;
+﻿using MyEmmControl.Communication.Checksum;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MyEmmControl
+namespace MyEmmControl.Communication
 {
     /// <summary>
     /// 校验类型
@@ -14,16 +15,16 @@ namespace MyEmmControl
         /// <summary>
         /// 无校验
         /// </summary>
-        None,
+        [ChecksumDataLength(0)] None,
 
         /// <summary>
         /// 固定值0x6B校验
         /// </summary>
-        Fixed_0x6B,
+        [ChecksumDataLength(1)] Fixed_0x6B,
 
         /// <summary>
         /// CRC校验
         /// </summary>
-        CRC
+        [ChecksumDataLength(1)] CRC_8
     }
 }

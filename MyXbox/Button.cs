@@ -2,7 +2,7 @@
 using System.ComponentModel;
 using System.Timers;
 
-namespace MyEmmControl.Communication
+namespace MyEmmControl
 {
     public partial class MyXbox
     {

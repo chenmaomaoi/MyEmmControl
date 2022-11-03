@@ -8,31 +8,38 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Markup;
 
 namespace MyEmmControl.Communication
 {
     [Description("串口通信")]
-    public class MySerialPort : ICommunication
+    public class MySerialPort : CommunicationBase
     {
         public SerialPort serialPort;
 
-        public event EventHandler<byte[]> OnRecvdData;
+        public override event EventHandler<byte[]> OnRecvdData;
 
         private bool getFlag = false;
 
         private List<byte> _data = new List<byte>();
 
-        public MySerialPort()
+        public MySerialPort() : this(ChecksumTypes.None) { }
+
+        public MySerialPort(ChecksumTypes checksumType) : base(checksumType)
         {
             this.serialPort = new SerialPort();
+            this.ChecksumType = checksumType;
             serialPort.DataReceived += serialPort_DataReceived;
         }
 
         private void serialPort_DataReceived(object sender, SerialDataReceivedEventArgs e)
         {
             byte[] result = new byte[serialPort.BytesToRead];
-
             serialPort.Read(result, 0, serialPort.BytesToRead);
+
+            byte[] dataBody = base.CheckData(result);
+            //校验值无效
+            if (dataBody.Length <= 0) return;
 
             if (!getFlag)
             {
@@ -45,20 +52,23 @@ namespace MyEmmControl.Communication
             }
         }
 
-        public bool? ConnectDeviceAndSettingWindow(Window owner)
+        public override bool ConnectDeviceAndSettingWindow(Window owner)
         {
             var dia = new MySerialPort_ConnectDeviceAndSettingWindow(this);
             dia.Owner = owner;
-            return dia.ShowDialog();
+            return (bool)dia.ShowDialog();
         }
 
-        public void Dispose()
+        public override void Dispose()
         {
             serialPort.Dispose();
         }
 
-        public void Send(byte[] data)
+        public override void Send(byte[] data)
         {
+            //计算并拼接校验值
+            byte[] checkData = _checksumer.Calculate(data);
+            byte[] sdata = data.Concat(checkData).ToArray();
             //获取串口状态，true为已打开，false为未打开
             if (!serialPort.IsOpen)
             {
@@ -69,10 +79,10 @@ namespace MyEmmControl.Communication
             //参数1：包含要写入端口的数据的字节数组。
             //参数2：参数中从零开始的字节偏移量，从此处开始将字节复制到端口。
             //参数3：要写入的字节数。 
-            serialPort.Write(data, 0, data.Length);
+            serialPort.Write(sdata, 0, sdata.Length);
         }
 
-        public byte[] Get(byte[] data)
+        public override byte[] Get(byte[] data)
         {
             getFlag = true;
             Send(data);

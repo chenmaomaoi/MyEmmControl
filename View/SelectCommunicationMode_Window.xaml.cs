@@ -8,7 +8,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using MyEmmControl.Attributes;
+using MyEmmControl.Extensions;
 using MyEmmControl.Communication;
 using SharpDX.Text;
 using Windows.Devices.Enumeration;

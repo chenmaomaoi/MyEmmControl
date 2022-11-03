@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace MyEmmControl.Communication
+namespace MyEmmControl
 {
     public partial class MyXbox
     {

@@ -1,4 +1,4 @@
-﻿using MyEmmControl.Attributes;
+﻿using MyEmmControl.Extensions;
 using MyEmmControl.Communication;
 using System;
 using System.Collections.Generic;
@@ -145,7 +145,7 @@ namespace MyEmmControl
         {
             if (data.Length > 2 && data[0] == UARTAddr)
             {
-                //todo:校验数据
+                //todo:校验已移动至单独类处理
                 //固定结尾0x6B校验
                 if (data[data.Length - 1] != 0x6B) return null;
 
@@ -188,17 +188,18 @@ namespace MyEmmControl
             //根据返回值处理标签进行操作
             switch (headattr.ReturnOperate)
             {
-                case CommandReturnOperateTypes.Value:
-                    PropertyInfo propertyInfo = typeof(EmmController).GetProperties().FirstOrDefault(x => x.GetFieldAttribute<DescriptionAttribute>().Description == _cmdHead.ToString());
-                    propertyInfo?.SetValue(this, retValue);
+                case CommandReturnOperationTypes.Value:
+                    PropertyInfo propertyInfo = typeof(EmmController).GetProperty(_cmdHead.ToString());
+                    if (propertyInfo == null) throw new NotImplementedException(_cmdHead.ToString());
+                    propertyInfo.SetValue(this, retValue);
                     break;
-                case CommandReturnOperateTypes.Other:
-                    typeof(EmmController).GetMethod(_cmdHead.ToString())?.Invoke(this, retValue);
+                case CommandReturnOperationTypes.Other:
+                    MethodInfo methodInfo = typeof(EmmController).GetMethod(_cmdHead.ToString());
+                    if (methodInfo == null) throw new NotImplementedException(_cmdHead.ToString());
+                    methodInfo.Invoke(this, retValue);
                     break;
-
-                case CommandReturnOperateTypes.No_Operation:
-                default:
-                    break;
+                case CommandReturnOperationTypes.No_Operation: break;
+                default: throw new ArgumentOutOfRangeException(nameof(headattr.ReturnOperate));
             }
             return retValue;
         }

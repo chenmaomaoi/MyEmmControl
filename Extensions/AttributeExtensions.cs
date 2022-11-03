@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Reflection;
 
-namespace MyEmmControl.Attributes
+namespace MyEmmControl.Extensions
 {
-    public static class AttributeEx
+    public static class AttributeExtensions
     {
         /// <summary>
         /// 获取字段上的自定义特性

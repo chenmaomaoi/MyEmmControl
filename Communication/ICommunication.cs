@@ -6,6 +6,11 @@ namespace MyEmmControl.Communication
     public interface ICommunication
     {
         /// <summary>
+        /// 数据校验模式
+        /// </summary>
+        ChecksumTypes ChecksumType { get; set; }
+
+        /// <summary>
         /// 发送数据
         /// </summary>
         /// <param name="data"></param>
@@ -20,7 +25,7 @@ namespace MyEmmControl.Communication
         /// 连接设备与设置
         /// </summary>
         /// <returns></returns>
-        bool? ConnectDeviceAndSettingWindow(Window owner);
+        bool ConnectDeviceAndSettingWindow(Window owner);
 
         /// <summary>
         /// 收到数据

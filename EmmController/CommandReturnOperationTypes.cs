@@ -9,7 +9,7 @@ namespace MyEmmControl
     /// <summary>
     /// 控制命令返回之后执行的操作
     /// </summary>
-    public enum CommandReturnOperateTypes
+    public enum CommandReturnOperationTypes
     {
         /// <summary>
         /// 无额外操作，直接丢弃

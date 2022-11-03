@@ -4,10 +4,10 @@ using System.ComponentModel;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
-using MyEmmControl.Attributes;
+using MyEmmControl.Extensions;
 using SharpDX.XInput;
 
-namespace MyEmmControl.Communication
+namespace MyEmmControl
 {
     public partial class MyXbox
     {

@@ -121,7 +121,8 @@
                                     Grid.Column="2"
                                     Maximum="1279"
                                     Value="230"
-                                    VerticalAlignment="Center"/>
+                                    VerticalAlignment="Center"
+                                    SmallChange="1"/>
                         </Grid>
                     </Grid>
 

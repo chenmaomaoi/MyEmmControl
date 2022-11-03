@@ -1,4 +1,4 @@
-﻿using MyEmmControl.Attributes;
+﻿using MyEmmControl.Extensions;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -50,7 +50,9 @@ namespace MyEmmControl.View
         private void btn_ConnectDevice_Click(object sender, RoutedEventArgs e)
         {
             //todo:判断是否连接成功。
-            new SelectCommunicationMode_Window().ShowDialog();
+            Window selectCommunicationMode =  new SelectCommunicationMode_Window();
+            selectCommunicationMode.Owner = this;
+            selectCommunicationMode.ShowDialog();
         }
 
         private void btn_Send_Click(object sender, RoutedEventArgs e)
@@ -61,7 +63,7 @@ namespace MyEmmControl.View
             {
                 Direction = directionOfRotation,
                 Speed = Convert.ToUInt16(text_Speed.Text),
-                Acceleration = Convert.ToByte(text_Acceleration.Text)
+                //Acceleration = Convert.ToByte(text_Acceleration.Text)
             };
             controller.SendCommand(CommandHeads.SetRotation, cmdBody);
         }

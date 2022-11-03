@@ -1,4 +1,6 @@
 ﻿using Cysharp.Threading.Tasks;
+using MyEmmControl.Communication.Checksum;
+using MyEmmControl.Extensions;
 using SharpDX;
 using System;
 using System.Collections.Generic;
@@ -27,7 +29,7 @@ namespace MyEmmControl.Communication
     }
 
     [Description("低功耗蓝牙(BLE)")]
-    public class MyBLE : ICommunication
+    public class MyBLE : CommunicationBase
     {
         #region 属性
         /// <summary>
@@ -76,7 +78,7 @@ namespace MyEmmControl.Communication
         /// 收到数据
         /// </summary>
         /// <remarks>线程已切换</remarks>
-        public event EventHandler<byte[]> OnRecvdData;
+        public override event EventHandler<byte[]> OnRecvdData;
         #endregion
 
         #region 常量
@@ -103,26 +105,17 @@ namespace MyEmmControl.Communication
         private List<byte> _data = new List<byte>();
 
         #region 公开方法
-        public MyBLE(string serviceGuid = "0000ffe0-0000-1000-8000-00805f9b34fb",
+
+        public MyBLE() : this(ChecksumTypes.None) { }
+
+        public MyBLE(ChecksumTypes checksumTypes,
+                     string serviceGuid = "0000ffe0-0000-1000-8000-00805f9b34fb",
                      string writeCharacteristicGuid = "0000ffe1-0000-1000-8000-00805f9b34fb",
-                     string notifyCharacteristicGuid = "0000ffe1-0000-1000-8000-00805f9b34fb")
+                     string notifyCharacteristicGuid = "0000ffe1-0000-1000-8000-00805f9b34fb") : base(checksumTypes)
         {
             this.ServiceGuid = serviceGuid;
             this.WriteCharacteristicGuid = writeCharacteristicGuid;
             this.NotifyCharacteristicGuid = notifyCharacteristicGuid;
-
-            watcher = DeviceInformation.CreateWatcher(AQS_ALL_BLUETOOTHLE_DEVICES,
-                                                      REQUESTED_PROPERTIES,
-                                                      DeviceInformationKind.AssociationEndpoint);
-            watcher.Added += watcher_Added;
-            watcher.EnumerationCompleted += watcher_EnumerationCompleted;
-        }
-
-        public MyBLE()
-        {
-            this.ServiceGuid = "0000ffe0-0000-1000-8000-00805f9b34fb";
-            this.WriteCharacteristicGuid = "0000ffe1-0000-1000-8000-00805f9b34fb";
-            this.NotifyCharacteristicGuid = "0000ffe1-0000-1000-8000-00805f9b34fb";
 
             watcher = DeviceInformation.CreateWatcher(AQS_ALL_BLUETOOTHLE_DEVICES,
                                                       REQUESTED_PROPERTIES,
@@ -158,7 +151,7 @@ namespace MyEmmControl.Communication
         /// 主动断开连接
         /// </summary>
         /// <returns></returns>
-        public void Dispose()
+        public override void Dispose()
         {
             CurrentDeviceMAC = null;
             CurrentService?.Dispose();
@@ -173,16 +166,19 @@ namespace MyEmmControl.Communication
         /// 发送数据
         /// </summary>
         /// <param name="data"></param>
-        public void Send(byte[] data)
+        public override void Send(byte[] data)
         {
+            //计算并拼接校验值
+            byte[] checkData = _checksumer.Calculate(data);
+            byte[] sdata = data.Concat(checkData).ToArray();
             if (CurrentWriteCharacteristic != null)
             {
-                Task.Run(() => CurrentWriteCharacteristic.WriteValueAsync(CryptographicBuffer.CreateFromByteArray(data),
+                Task.Run(() => CurrentWriteCharacteristic.WriteValueAsync(CryptographicBuffer.CreateFromByteArray(sdata),
                                                                           GattWriteOption.WriteWithResponse));
             }
         }
 
-        public byte[] Get(byte[] data)
+        public override byte[] Get(byte[] data)
         {
             getFlag = true;
             Send(data);
@@ -203,12 +199,12 @@ namespace MyEmmControl.Communication
             return result.ToArray();
         }
 
-        public bool? ConnectDeviceAndSettingWindow(Window owner)
+        public override bool ConnectDeviceAndSettingWindow(Window owner)
         {
             //设置与连接
             var dia = new MyBLE_ConnectDeviceAndSettingWindow(this);
             dia.Owner = owner;
-            return dia.ShowDialog();
+            return (bool)dia.ShowDialog();
         }
         #endregion
 
@@ -342,14 +338,18 @@ namespace MyEmmControl.Communication
             CryptographicBuffer.CopyToByteArray(args.CharacteristicValue, out byte[] data);
             await UniTask.SwitchToThreadPool();
 
+            byte[] dataBody = base.CheckData(data);
+            //校验值无效
+            if (dataBody.Length <= 0) return;
+
             if (!getFlag)
             {
-                OnRecvdData?.Invoke(sender, data);
+                OnRecvdData?.Invoke(sender, dataBody);
             }
             else
             {
                 _data.Clear();
-                _data.AddRange(data);
+                _data.AddRange(dataBody);
             }
         }
 
