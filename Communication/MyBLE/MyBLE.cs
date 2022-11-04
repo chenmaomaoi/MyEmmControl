@@ -174,7 +174,7 @@ namespace MyEmmControl.Communication
             if (CurrentWriteCharacteristic != null)
             {
                 Task.Run(() => CurrentWriteCharacteristic.WriteValueAsync(CryptographicBuffer.CreateFromByteArray(sdata),
-                                                                          GattWriteOption.WriteWithResponse));
+                                                                                  GattWriteOption.WriteWithResponse));
             }
         }
 
@@ -189,7 +189,7 @@ namespace MyEmmControl.Communication
                 Thread.Sleep(1);
                 if (DateTime.Now.Subtract(_sendTime).TotalSeconds > 5)
                 {
-                    throw new Exception("低功耗蓝夜设备未响应");
+                    throw new Exception("低功耗蓝牙设备未响应");
                 }
             }
 

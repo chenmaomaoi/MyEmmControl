@@ -107,12 +107,6 @@ namespace MyEmmControl
         /// <remarks>读取型指令没有指令体</remarks>
         private CommandBody _cmdBody { get; set; }
 
-        /// <summary>
-        /// 检验字节
-        /// </summary>
-        /// <remarks>通过校验或者返回固定的0x6B</remarks>
-        private byte[] _dataCheck { get; set; } = { 0x6B };
-
         private ICommunication _communication;
 
         /// <summary>
@@ -133,29 +127,25 @@ namespace MyEmmControl
                     //角度转动模式结束
                     EventSetPositionDone?.Invoke(sender, new EventArgs());
                 }
+                else
+                {
+                    //todo:记录抛出的数据
+                    throw new NotImplementedException(dat.ToString());
+                }
             };
         }
 
         /// <summary>
-        /// 数据处理与校验
+        /// 数据处理：去除前缀地址
         /// </summary>
         /// <param name="data"></param>
         /// <returns></returns>
         private byte[] DataFilter(byte[] data)
         {
-            if (data.Length > 2 && data[0] == UARTAddr)
+            if (data.Length > 1 && data[0] == UARTAddr)
             {
-                //todo:校验已移动至单独类处理
-                //固定结尾0x6B校验
-                if (data[data.Length - 1] != 0x6B) return null;
-
-                //掐头去尾
-                byte[] ndata = new byte[data.Length - 2];
-                for (int i = 1; i < data.Length - 1; i++)
-                {
-                    ndata[i - 1] = data[i];
-                }
-                return ndata;
+                //抛弃通信地址
+                return data.Skip(1).ToArray();
             }
             return null;
         }
@@ -176,14 +166,14 @@ namespace MyEmmControl
 
             //拼接命令
             byte[] _cmd = (_cmdBody == null)
-                       ? new byte[] { UARTAddr }.Concat(head).Concat(_dataCheck).ToArray()
-                       : new byte[] { UARTAddr }.Concat(head).Concat(_cmdBody.GetCommandBody()).Concat(_dataCheck).ToArray();
+                       ? new byte[] { UARTAddr }.Concat(head).ToArray()
+                       : new byte[] { UARTAddr }.Concat(head).Concat(_cmdBody.GetCommandBody()).ToArray();
 
             //发送命令并处理校验返回值，倒序
-            IEnumerable<byte> uartMessgae = DataFilter(_communication.Get(_cmd)).Reverse();
+            var uartMessgae = DataFilter(_communication.Get(_cmd)).Reverse().ToArray();
 
             //解析返回值
-            dynamic retValue = headattr.GetValue(uartMessgae.ToArray());
+            var retValue = headattr.GetValue(uartMessgae);
 
             //根据返回值处理标签进行操作
             switch (headattr.ReturnOperate)

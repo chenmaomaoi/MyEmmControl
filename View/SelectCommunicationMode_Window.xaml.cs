@@ -47,7 +47,7 @@ namespace MyEmmControl.View
             string typeName = cbx_CommunicationType.SelectedItem.ToString();
             communicationNames.TryGetValue(typeName, out Type communicationType);
             ICommunication communication = (ICommunication)Activator.CreateInstance(communicationType);
-            bool res = (bool)communication.ConnectDeviceAndSettingWindow(this);
+            bool res = communication.ConnectDeviceAndSettingWindow(this);
             if (res)
             {
                 App.MainWindow.controller = new EmmController(communication);
