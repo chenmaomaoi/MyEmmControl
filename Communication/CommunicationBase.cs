@@ -21,8 +21,8 @@ namespace MyEmmControl.Communication
 
         protected CommunicationBase(ChecksumTypes checksumTypes)
         {
+            _checksumer = new Checksumer(checksumTypes);
             ChecksumType = checksumTypes;
-            _checksumer = new Checksumer(ChecksumType);
         }
 
         /// <summary>

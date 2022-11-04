@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:MyEmmControl"
         mc:Ignorable="d"
-        Title="MyEmmControl-选择通信模式"
+        Title="选择通信模式"
         Height="150"
         Width="350"
         WindowStartupLocation="CenterOwner">

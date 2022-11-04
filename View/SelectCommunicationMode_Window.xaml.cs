@@ -27,8 +27,7 @@ namespace MyEmmControl.View
             InitializeComponent();
 
             var types = AppDomain.CurrentDomain.GetAssemblies()
-                    .SelectMany(a => a.GetTypes().Where(t => t.GetInterfaces().Contains(typeof(ICommunication))))
-                    .ToArray();
+                    .SelectMany(a => a.GetTypes().Where(t => t.BaseType == typeof(CommunicationBase)));
             foreach (Type type in types)
             {
                 string description = type.GetCustomAttribute<DescriptionAttribute>().Description;
@@ -51,13 +50,13 @@ namespace MyEmmControl.View
             if (res)
             {
                 App.MainWindow.controller = new EmmController(communication);
-
+                DialogResult = true;
                 this.Close();
             }
             else
             {
                 //返回
-                MessageBox.Show("未连接");
+                MessageBox.Show("连接失败");
             }
         }
     }

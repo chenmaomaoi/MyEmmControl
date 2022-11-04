@@ -170,7 +170,7 @@ namespace MyEmmControl.Communication
         {
             //计算并拼接校验值
             byte[] checkData = _checksumer.Calculate(data);
-            byte[] sdata = data.Concat(checkData).ToArray();
+            byte[] sdata = checkData != null ? data.Concat(checkData).ToArray() : data;
             if (CurrentWriteCharacteristic != null)
             {
                 Task.Run(() => CurrentWriteCharacteristic.WriteValueAsync(CryptographicBuffer.CreateFromByteArray(sdata),
