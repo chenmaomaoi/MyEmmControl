@@ -41,7 +41,19 @@
                             <RowDefinition Height="Auto"/>
                             <RowDefinition Height="1*"/>
                         </Grid.RowDefinitions>
-                        <Button x:Name="btn_CalibrationEncoder"
+                        <!--设置校验码-->
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="校验位："/>
+                            <ComboBox x:Name="cbx_CheckType" Grid.Column="1" SelectionChanged="cbx_CheckType_SelectionChanged">
+                                
+                            </ComboBox>
+                        </Grid>
+
+                            <Button x:Name="btn_CalibrationEncoder"
                                 Content="校准"
                                 HorizontalAlignment="Center"
                                 Margin="0,71,0,0"
@@ -141,7 +153,7 @@
                                              Margin="1"
                                              Grid.Row="0"
                                              HorizontalAlignment="Center"
-                                             VerticalAlignment="Center"/>
+                                             VerticalAlignment="Center" Checked="radio_SpeedPercentMode_Checked"/>
                                     <RadioButton Content="绝对值"
                                              Margin="1"
                                              Grid.Row="1"
@@ -192,7 +204,7 @@
                                              Margin="1"
                                              Grid.Row="0"
                                              HorizontalAlignment="Center"
-                                             VerticalAlignment="Center"/>
+                                             VerticalAlignment="Center" Checked="radio_AcceleratePercentMode_Checked"/>
                                     <RadioButton Content="绝对值"
                                              Margin="1"
                                              Grid.Row="1"
@@ -242,7 +254,7 @@
                                                  Margin="1"
                                                  Grid.Row="0"
                                                  HorizontalAlignment="Center"
-                                                 VerticalAlignment="Center"/>
+                                                 VerticalAlignment="Center" Checked="radio_AngleMode_Checked"/>
                                     <RadioButton Content="脉冲"
                                                  Margin="1"
                                                  Grid.Row="1"
