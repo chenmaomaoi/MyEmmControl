@@ -21,15 +21,34 @@ namespace MyEmmControl.View
     /// <summary>
     /// MainWindow.xaml 的交互逻辑
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class MainWindow : Window, INotifyPropertyChanged
     {
         public EmmController controller;
 
-        private Dictionary<string,ChecksumTypes> checksums = new Dictionary<string,ChecksumTypes>();
+        private Dictionary<string, ChecksumTypes> checksums = new Dictionary<string, ChecksumTypes>();
+
+        private double _speedValue;
+        public double SpeedValue
+        {
+            get => _speedValue;
+            set
+            {
+                _speedValue = value;
+                OnPropertyChanged(nameof(SpeedValue));
+            }
+        }
+
+        protected internal virtual void OnPropertyChanged(string propertyName)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+        public event PropertyChangedEventHandler PropertyChanged;
+
 
         public MainWindow()
         {
             InitializeComponent();
+            this.DataContext = this;
 
             foreach (ChecksumTypes checksumType in Enum.GetValues(typeof(ChecksumTypes)))
             {
@@ -67,29 +86,16 @@ namespace MyEmmControl.View
         private void btn_Send_Click(object sender, RoutedEventArgs e)
         {
             //发送命令
+            var v = ss.Value;
+
         }
 
         private void cbx_CheckType_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if( checksums.TryGetValue(cbx_CheckType.SelectedIndex.ToString(), out var type))
+            if (checksums.TryGetValue(cbx_CheckType.SelectedIndex.ToString(), out var type))
             {
                 controller.ChecksumType = type;
             }
-        }
-
-        private void radio_SpeedPercentMode_Checked(object sender, RoutedEventArgs e)
-        {
-            //速度 百分比模式和绝对值模式
-        }
-
-        private void radio_AcceleratePercentMode_Checked(object sender, RoutedEventArgs e)
-        {
-            //加速度
-        }
-
-        private void radio_AngleMode_Checked(object sender, RoutedEventArgs e)
-        {
-            //转角/脉冲
         }
     }
 }

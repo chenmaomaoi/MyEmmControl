@@ -71,6 +71,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="View\MyControl\MySlider.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="View\SelectCommunicationMode_Window.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -106,6 +110,9 @@
     <Compile Include="EmmController\EmmController.cs" />
     <Compile Include="View\MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\MyControl\MySlider.xaml.cs">
+      <DependentUpon>MySlider.xaml</DependentUpon>
     </Compile>
     <Compile Include="View\SelectCommunicationMode_Window.xaml.cs">
       <DependentUpon>SelectCommunicationMode_Window.xaml</DependentUpon>
