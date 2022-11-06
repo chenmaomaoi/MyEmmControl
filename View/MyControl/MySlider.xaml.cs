@@ -1,70 +1,81 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace MyEmmControl.View.MyControl
 {
     /// <summary>
     /// MySlider.xaml 的交互逻辑
     /// </summary>
-    public partial class MySlider : UserControl, INotifyPropertyChanged
+    public partial class MySlider : UserControl
     {
-        protected internal virtual void OnPropertyChanged(string propertyName)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
-
         public double Value
         {
-            get
-            {
-                OnPropertyChanged(nameof(Value));
-                return (double)GetValue(ValueProperty);
-            }
-            set
-            {
-                SetValue(ValueProperty, value);
-                OnPropertyChanged(nameof(Value));
-            }
+            get => (double)GetValue(ValueProperty);
+            set => SetValue(ValueProperty, value);
         }
         // Using a DependencyProperty as the backing store for Value.  This enables animation, styling, binding, etc...
         private static readonly DependencyProperty ValueProperty =
-            DependencyProperty.Register("Value",
+            DependencyProperty.Register(nameof(Value),
                                         typeof(double),
                                         typeof(MySlider),
-                                        new PropertyMetadata(0.0));
+                                        new PropertyMetadata(default(double)));
 
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        public bool UsePercent
+        public bool IsUsePercent
         {
-            get => (bool)GetValue(UsePercentProperty);
-            set { SetValue(UsePercentProperty, value); OnPropertyChanged(nameof(UsePercent)); }
+            get => (bool)GetValue(IsUsePercentProperty);
+            set
+            {
+                SetValue(IsUsePercentProperty, value);
+            }
         }
         // Using a DependencyProperty as the backing store for UsePercent.  This enables animation, styling, binding, etc...
-        public static readonly DependencyProperty UsePercentProperty =
-            DependencyProperty.Register("UsePercent",
+        public static readonly DependencyProperty IsUsePercentProperty =
+            DependencyProperty.Register(nameof(IsUsePercent),
                                         typeof(bool),
                                         typeof(MySlider),
                                         new PropertyMetadata(true));
 
 
+        public int Maximum
+        {
+            get { return (int)GetValue(MaximumProperty); }
+            set { SetValue(MaximumProperty, value); }
+        }
+        // Using a DependencyProperty as the backing store for Maximum.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty MaximumProperty =
+            DependencyProperty.Register(nameof(Maximum),
+                                        typeof(int),
+                                        typeof(MySlider),
+                                        new PropertyMetadata(default(int)));
+
+
         public MySlider()
         {
             InitializeComponent();
-            this.DataContext = this;
+        }
+
+        private bool _firstTime = true;
+        private void RadioButton_Checked(object sender, RoutedEventArgs e)
+        {
+            if (_firstTime)
+            {
+                _firstTime = false;
+            }
+            else
+            {
+                if (IsUsePercent)
+                {
+                    slider.Maximum = 100;
+                    slider.SmallChange = 0.1;
+                    slider.TickFrequency = 0.1;
+                }
+                else
+                {
+                    slider.Maximum = Maximum;
+                    slider.SmallChange = 1;
+                    slider.TickFrequency = 1;
+                }
+            }
         }
     }
 }

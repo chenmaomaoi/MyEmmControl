@@ -5,6 +5,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:MyEmmControl.View.MyControl"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    Name="MySliderCtrl"
     MinWidth="200"
     MinHeight="53"
     d:DesignHeight="53"
@@ -23,19 +24,20 @@
             VerticalAlignment="Center"
             Orientation="Vertical">
             <RadioButton
-                x:Name="radio_PercentMode"
+                Name="radio_UsePercentMode"
                 Grid.Row="0"
                 Margin="1"
                 HorizontalAlignment="Center"
                 VerticalAlignment="Center"
+                Checked="RadioButton_Checked"
                 Content="百分比"
-                IsChecked="{Binding UsePercent}" />
+                IsChecked="{Binding ElementName=MySliderCtrl, Path=IsUsePercent, Mode=TwoWay}" />
             <RadioButton
-                x:Name="radio_ValueMode"
                 Grid.Row="1"
                 Margin="1"
                 HorizontalAlignment="Center"
                 VerticalAlignment="Center"
+                Checked="RadioButton_Checked"
                 Content="绝对值" />
         </WrapPanel>
         <TextBox
@@ -46,7 +48,7 @@
             HorizontalAlignment="Center"
             VerticalAlignment="Center"
             InputMethod.IsInputMethodEnabled="False"
-            Text="{Binding Value, ElementName=slider}" />
+            Text="{Binding ElementName=MySliderCtrl, Path=Value}" />
         <Slider
             Name="slider"
             Grid.Column="2"
@@ -55,7 +57,6 @@
             Maximum="100"
             SmallChange="0.1"
             TickFrequency="0.1"
-            Value="{Binding Value}" />
-
+            Value="{Binding ElementName=MySliderCtrl, Path=Value}" />
     </Grid>
 </UserControl>

@@ -141,7 +141,10 @@
                         </Grid>
 
                         <!--  速度  -->
-                        <uc:MySlider x:Name="ss" Grid.Row="3" Value="{Binding SpeedValue}" />
+                        <uc:MySlider
+                            x:Name="mySlider_Speed"
+                            Grid.Row="3"
+                            Value="{Binding SpeedValue, Mode=TwoWay}" />
 
                         <Button
                             x:Name="btn_Send"
@@ -157,7 +160,7 @@
 
             <!--  日志区  -->
             <Grid Grid.Row="1" Margin="5">
-                <TextBlock x:Name="text_Log" />
+                <TextBlock x:Name="text_Log" Text="{Binding SpeedValue, Mode=TwoWay}" />
             </Grid>
         </Grid>
     </Grid>
