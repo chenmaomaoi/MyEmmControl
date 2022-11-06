@@ -62,7 +62,7 @@ namespace MyEmmControl.View
                 cbx_CheckType.SelectedIndex = 0;
             }
 
-            mySlider_Speed.Maximum = 300;
+            //mySlider_Speed.Maximum = 300;
         }
 
         private void AddLog(string text)
@@ -88,7 +88,7 @@ namespace MyEmmControl.View
         private void btn_Send_Click(object sender, RoutedEventArgs e)
         {
             //发送命令
-            var v = mySlider_Speed.IsUsePercent;
+            //var v = mySlider_Speed.IsUsePercent;
 
         }
 

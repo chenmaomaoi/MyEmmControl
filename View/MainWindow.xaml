@@ -80,79 +80,125 @@
                             <RowDefinition Height="Auto" />
                             <RowDefinition Height="Auto" />
                         </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="1*" />
+                        </Grid.ColumnDefinitions>
                         <!--  运动模式  -->
-                        <Grid Grid.Row="0" Margin="5">
-                            <Grid Grid.Column="0">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="Auto" />
-                                    <ColumnDefinition Width="Auto" />
-                                    <ColumnDefinition Width="Auto" />
-                                </Grid.ColumnDefinitions>
-                                <TextBlock
-                                    Margin="4,1,1,1"
-                                    HorizontalAlignment="Center"
-                                    VerticalAlignment="Center"
-                                    Text="运动模式：" />
-                                <RadioButton
-                                    x:Name="radio_SpeedMode"
-                                    Grid.Column="1"
-                                    Margin="0,0,2,0"
-                                    HorizontalAlignment="Left"
-                                    VerticalAlignment="Center"
-                                    Content="速度模式"
-                                    IsChecked="True" />
-                                <RadioButton
-                                    Grid.Column="2"
-                                    Margin="2,0,0,0"
-                                    HorizontalAlignment="Left"
-                                    VerticalAlignment="Center"
-                                    Content="位置模式" />
-                            </Grid>
+                        <TextBlock
+                            Grid.Row="0"
+                            Grid.Column="0"
+                            HorizontalAlignment="Right"
+                            VerticalAlignment="Center"
+                            Text="运动模式：" />
+                        <Grid
+                            Grid.Row="0"
+                            Grid.Column="1"
+                            Margin="5"
+                            HorizontalAlignment="Left">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <RadioButton
+                                x:Name="radio_SpeedMode"
+                                Grid.Column="0"
+                                Margin="0,0,2,0"
+                                HorizontalAlignment="Left"
+                                VerticalAlignment="Center"
+                                Content="速度模式"
+                                IsChecked="True" />
+                            <RadioButton
+                                Grid.Column="1"
+                                Margin="2,0,0,0"
+                                HorizontalAlignment="Left"
+                                VerticalAlignment="Center"
+                                Content="位置模式" />
                         </Grid>
 
                         <!--  运动方向  -->
-                        <Grid Grid.Row="1" Margin="5">
-                            <Grid Grid.Column="0">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="Auto" />
-                                    <ColumnDefinition Width="Auto" />
-                                    <ColumnDefinition Width="Auto" />
-                                </Grid.ColumnDefinitions>
-                                <TextBlock
-                                    Margin="4,1,1,1"
-                                    HorizontalAlignment="Center"
-                                    VerticalAlignment="Center"
-                                    Text="运动方向：" />
-                                <RadioButton
-                                    x:Name="radio_DirectionCW"
-                                    Grid.Column="1"
-                                    Margin="0,0,14,0"
-                                    HorizontalAlignment="Left"
-                                    VerticalAlignment="Center"
-                                    Content="顺时针"
-                                    IsChecked="True" />
-                                <RadioButton
-                                    Grid.Column="2"
-                                    Margin="2,0,0,0"
-                                    HorizontalAlignment="Left"
-                                    VerticalAlignment="Center"
-                                    Content="逆时针" />
-                            </Grid>
+                        <TextBlock
+                            Grid.Row="1"
+                            Grid.Column="0"
+                            HorizontalAlignment="Right"
+                            VerticalAlignment="Center"
+                            Text="运动方向：" />
+                        <Grid
+                            Grid.Row="1"
+                            Grid.Column="1"
+                            Margin="5"
+                            HorizontalAlignment="Left">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <RadioButton
+                                Grid.Column="0"
+                                Margin="0,0,14,0"
+                                HorizontalAlignment="Left"
+                                VerticalAlignment="Center"
+                                Content="顺时针"
+                                IsChecked="True" />
+                            <RadioButton
+                                Grid.Column="1"
+                                Margin="2,0,0,0"
+                                HorizontalAlignment="Left"
+                                VerticalAlignment="Center"
+                                Content="逆时针" />
                         </Grid>
 
                         <!--  速度  -->
+                        <TextBlock
+                            Grid.Row="2"
+                            Grid.Column="0"
+                            HorizontalAlignment="Right"
+                            VerticalAlignment="Center"
+                            Text="速度：" />
                         <uc:MySlider
-                            x:Name="mySlider_Speed"
+                            Grid.Row="2"
+                            Grid.Column="1"
+                            Margin="5"
+                            AbsoluteMaximum="0x4FF"
+                            RelativeMaximum="100"
+                            RelativeText="百分比" />
+
+                        <!--  加速度  -->
+                        <TextBlock
                             Grid.Row="3"
-                            Value="{Binding SpeedValue, Mode=TwoWay}" />
+                            Grid.Column="0"
+                            HorizontalAlignment="Right"
+                            VerticalAlignment="Center"
+                            Text="加速度：" />
+                        <uc:MySlider
+                            Grid.Row="3"
+                            Grid.Column="1"
+                            Margin="5"
+                            AbsoluteMaximum="0xFF"
+                            RelativeMaximum="100"
+                            RelativeText="百分比" />
+
+                        <!--  脉冲数/转动角度  -->
+                        <TextBlock
+                            Grid.Row="4"
+                            Grid.Column="0"
+                            HorizontalAlignment="Right"
+                            VerticalAlignment="Center"
+                            Text="角度/脉冲：" />
+                        <uc:MySlider
+                            Grid.Row="4"
+                            Grid.Column="1"
+                            Margin="5"
+                            AbsoluteMaximum="0xFFFFFF"
+                            AbsoluteText="脉冲数"
+                            RelativeMaximum="360"
+                            RelativeText="角度值" />
 
                         <Button
-                            x:Name="btn_Send"
                             Grid.Row="5"
+                            Grid.Column="1"
                             Margin="5"
                             HorizontalAlignment="Right"
                             VerticalAlignment="Top"
-                            Click="btn_Send_Click"
                             Content="发送" />
                     </Grid>
                 </GroupBox>
