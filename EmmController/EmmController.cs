@@ -5,10 +5,11 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
+using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace MyEmmControl
 {
-    public class EmmController
+    public class EmmController : ObservableObject
     {
         /// <summary>
         /// 通信地址
@@ -17,26 +18,39 @@ namespace MyEmmControl
         /// 0为广播地址<para/>
         /// 1-247为设备地址<para/>
         /// </remarks>
-        [Description(nameof(CommandHeads.UpdateUARTAddr))]
-        public byte UARTAddr { get; set; } = 0x01;
+        [Description(nameof(EmmCmdHeads.UpdateUARTAddr))]
+        public byte UARTAddr { get => _uartAddr; set => SetProperty(ref _uartAddr, value); }
+        private byte _uartAddr = 0x01;
 
         /// <summary>
         /// 编码器值
         /// </summary>
-        [Description(nameof(CommandHeads.ReadEncoderValue))]
-        public ushort EncoderValue { get; private set; }
+        [Description(nameof(EmmCmdHeads.ReadEncoderValue))]
+        public ushort EncoderValue { get => _encoderValue; private set => SetProperty(ref _encoderValue, value); }
+        private ushort _encoderValue = default;
 
         /// <summary>
         /// 脉冲数
         /// </summary>
-        [Description(nameof(CommandHeads.ReadPulsCount))]
-        public int PulsCount { get; private set; }
+        [Description(nameof(EmmCmdHeads.ReadPulsCount))]
+        public int PulsCount { get => _pulsCount; private set => SetProperty(ref _pulsCount, value); }
+        private int _pulsCount = default;
 
         /// <summary>
         /// 电机位置
         /// </summary>
-        [Description(nameof(CommandHeads.ReadMotorPosition))]
-        public int MotorPosition { get; private set; }
+        [Description(nameof(EmmCmdHeads.ReadMotorPosition))]
+        public int MotorPosition
+        {
+            get => _motorPosition;
+            private set
+            {
+                //同时还需要触发转角变化
+                if (SetProperty(ref _motorPosition, value))
+                    OnPropertyChanged(new PropertyChangedEventArgs(nameof(MotorPosition)));
+            }
+        }
+        private int _motorPosition = default;
 
         /// <summary>
         /// 电机位置（电机转过的角度）
@@ -46,68 +60,71 @@ namespace MyEmmControl
         /// <summary>
         /// 位置误差
         /// </summary>
-        [Description(nameof(CommandHeads.ReadPositionError))]
-        public short PositionError { get; private set; }
+        [Description(nameof(EmmCmdHeads.ReadPositionError))]
+        public short PositionError { get => _positionError; private set => SetProperty(ref _positionError, value); }
+        private short _positionError = default;
 
         /// <summary>
         /// 堵转状态
         /// </summary>
-        [Description(nameof(CommandHeads.ReadBlockageProtectionState))]
-        public bool BlockageProtectionState { get; private set; }
+        [Description(nameof(EmmCmdHeads.ReadBlockageProtectionState))]
+        public bool BlockageProtectionState
+        {
+            get => _blockageProtectionState;
+            private set => SetProperty(ref _blockageProtectionState, value);
+        }
+        private bool _blockageProtectionState = default;
 
         /// <summary>
         /// 单圈上电回零状态
         /// </summary>
-        [Description(nameof(CommandHeads.ReadInitiationState))]
+        [Description(nameof(EmmCmdHeads.ReadInitiationState))]
         public bool InitiationState
         {
-            get => _InitiationState;
-            private set => _InitiationState = !value;
+            get => _initiationState;
+            private set => SetProperty(ref _initiationState, !value);
         }
-        private bool _InitiationState;
+        private bool _initiationState = default;
 
         /// <summary>
         /// 驱动板状态
         /// </summary>
-        [Description(nameof(CommandHeads.IsEnable))]
-        public bool BoardIsEnable { get; private set; }
+        [Description(nameof(EmmCmdHeads.IsEnable))]
+        public bool BoardIsEnable { get => _boardIsEnable; private set => SetProperty(ref _boardIsEnable, value); }
+        private bool _boardIsEnable = default;
 
         /// <summary>
         /// 细分步数
         /// </summary>
-        [Description(nameof(CommandHeads.UpdateSubdivision))]
-        public byte Subdivision { get; private set; }
+        [Description(nameof(EmmCmdHeads.UpdateSubdivision))]
+        public byte Subdivision { get => _subdivision; private set => SetProperty(ref _subdivision, value); }
+        private byte _subdivision = default;
 
         /// <summary>
         /// 保存的正反转参数
         /// </summary>
         /// <remarks>方向，速度，加速度</remarks>
-        [Description(nameof(CommandHeads.StoreRotation))]
-        public CommandBody RotationMemory { get; private set; }
+        [Description(nameof(EmmCmdHeads.StoreRotation))]
+        public EmmCmdBody RotationMemory { get; private set; }
 
         /// <summary>
         /// 当前的正反转参数
         /// </summary>
-        [Description(nameof(CommandHeads.SetRotation))]
-        public CommandBody RotationCurrent { get; private set; }
-
-        /// <summary>
-        /// 数据校验类型
-        /// </summary>
-        public ChecksumTypes ChecksumType { get; set; }
+        [Description(nameof(EmmCmdHeads.SetRotation))]
+        public EmmCmdBody RotationCurrent { get; private set; }
 
         /// <summary>
         /// 指令头
         /// </summary>
-        private CommandHeads _cmdHead { get; set; }
+        private EmmCmdHeads _emmCmdHead { get; set; }
 
         /// <summary>
         /// 指令体
         /// </summary>
         /// <remarks>读取型指令没有指令体</remarks>
-        private CommandBody _cmdBody { get; set; }
+        private EmmCmdBody _emmCmdBody { get; set; }
 
-        private ICommunication _communication;
+        public ICommunication Communication { get; set; }
 
         /// <summary>
         /// 位置运动模式结束-到达指定位置
@@ -116,13 +133,13 @@ namespace MyEmmControl
 
         public EmmController(ICommunication communication)
         {
-            this._communication = communication;
+            this.Communication = communication;
 
             //非Get模式收到数据
-            this._communication.OnRecvdData += (object sender, byte[] e) =>
+            this.Communication.OnRecvdData += (object sender, byte[] e) =>
             {
                 byte[] dat = DataFilter(e);
-                if (dat.Length == 1 && dat[0] == (byte)CommandReturnValues.PcmdRet)
+                if (dat.Length == 1 && dat[0] == (byte)EmmCmdReturnValues.PcmdRet)
                 {
                     //角度转动模式结束
                     EventSetPositionDone?.Invoke(sender, new EventArgs());
@@ -153,24 +170,24 @@ namespace MyEmmControl
         /// <summary>
         /// 发送指令
         /// </summary>
-        /// <param name="cmdhead"></param>
-        /// <param name="cmdbody"></param>
-        public string SendCommand(CommandHeads cmdhead, CommandBody cmdbody = null)
+        /// <param name="emmCmdhead"></param>
+        /// <param name="emmCmdbody"></param>
+        public string SendCommand(EmmCmdHeads emmCmdhead, EmmCmdBody emmCmdbody = null)
         {
-            _cmdHead = cmdhead;
-            _cmdBody = cmdbody;
+            _emmCmdHead = emmCmdhead;
+            _emmCmdBody = emmCmdbody;
 
             //取命令
-            var headattr = _cmdHead.GetFieldAttribute<CommandAttribute>();
-            byte[] head = headattr.Command;
+            var headattr = _emmCmdHead.GetFieldAttribute<EmmCmdAttribute>();
+            byte[] head = headattr.EmmCmd;
 
             //拼接命令
-            byte[] _cmd = (_cmdBody == null)
+            byte[] _cmd = (_emmCmdBody == null)
                        ? new byte[] { UARTAddr }.Concat(head).ToArray()
-                       : new byte[] { UARTAddr }.Concat(head).Concat(_cmdBody.GetCommandBody()).ToArray();
+                       : new byte[] { UARTAddr }.Concat(head).Concat(_emmCmdBody.GetCommandBody()).ToArray();
 
             //发送命令并处理校验返回值，倒序
-            var uartMessgae = DataFilter(_communication.Get(_cmd)).Reverse().ToArray();
+            var uartMessgae = DataFilter(Communication.Get(_cmd)).Reverse().ToArray();
 
             //解析返回值
             var retValue = headattr.GetValue(uartMessgae);
@@ -178,17 +195,17 @@ namespace MyEmmControl
             //根据返回值处理标签进行操作
             switch (headattr.ReturnOperate)
             {
-                case CommandReturnOperationTypes.Value:
-                    PropertyInfo propertyInfo = typeof(EmmController).GetProperty(_cmdHead.ToString());
-                    if (propertyInfo == null) throw new NotImplementedException(_cmdHead.ToString());
+                case EmmCmdReturnOperationTypes.Value:
+                    PropertyInfo propertyInfo = typeof(EmmController).GetProperty(_emmCmdHead.ToString());
+                    if (propertyInfo == null) throw new NotImplementedException(_emmCmdHead.ToString());
                     propertyInfo.SetValue(this, retValue);
                     break;
-                case CommandReturnOperationTypes.Other:
-                    MethodInfo methodInfo = typeof(EmmController).GetMethod(_cmdHead.ToString());
-                    if (methodInfo == null) throw new NotImplementedException(_cmdHead.ToString());
+                case EmmCmdReturnOperationTypes.Other:
+                    MethodInfo methodInfo = typeof(EmmController).GetMethod(_emmCmdHead.ToString());
+                    if (methodInfo == null) throw new NotImplementedException(_emmCmdHead.ToString());
                     methodInfo.Invoke(this, retValue);
                     break;
-                case CommandReturnOperationTypes.No_Operation: break;
+                case EmmCmdReturnOperationTypes.No_Operation: break;
                 default: throw new ArgumentOutOfRangeException(nameof(headattr.ReturnOperate));
             }
             return retValue;
@@ -209,7 +226,7 @@ namespace MyEmmControl
         /// </summary>
         private bool UpdateSubdivision(bool e)
         {
-            if (e) this.Subdivision = (byte)_cmdBody.Data;
+            if (e) this.Subdivision = (byte)_emmCmdBody.Data;
             return e;
         }
 
@@ -218,7 +235,7 @@ namespace MyEmmControl
         /// </summary>
         private bool UpdateUARTAddr(bool e)
         {
-            if (e) this.UARTAddr = (byte)_cmdBody.Data;
+            if (e) this.UARTAddr = (byte)_emmCmdBody.Data;
             return e;
         }
 
@@ -241,7 +258,7 @@ namespace MyEmmControl
         /// </summary>
         private bool SetRotation(bool e)
         {
-            if (e) this.RotationCurrent = _cmdBody;
+            if (e) this.RotationCurrent = _emmCmdBody;
             return e;
         }
 

@@ -3,7 +3,7 @@
     /// <summary>
     /// 命令返回的值类型
     /// </summary>
-    public enum CommandReturnValueTypes
+    public enum EmmCmdReturnValueTypes
     {
         Bool,
         State,

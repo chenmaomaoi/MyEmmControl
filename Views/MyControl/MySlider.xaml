@@ -1,9 +1,9 @@
 ﻿<UserControl
-    x:Class="MyEmmControl.View.MyControl.MySlider"
+    x:Class="MyEmmControl.Views.MyControl.MySlider"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:local="clr-namespace:MyEmmControl.View.MyControl"
+    xmlns:local="clr-namespace:MyEmmControl.Views.MyControl"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     Name="MySliderCtrl"
     d:DesignHeight="53"
@@ -34,7 +34,7 @@
                 HorizontalAlignment="Center"
                 VerticalAlignment="Center"
                 Checked="RadioButton_Checked"
-                Content="{Binding ElementName=MySliderCtrl, Path=AbsoluteText}" />
+                Content="{Binding ElementName=MySliderCtrl, Path=AbsoluteText, Mode=TwoWay}" />
         </WrapPanel>
         <TextBox
             Grid.Column="1"
@@ -44,15 +44,15 @@
             HorizontalAlignment="Center"
             VerticalAlignment="Center"
             InputMethod.IsInputMethodEnabled="False"
-            Text="{Binding ElementName=slider, Path=Value}" />
+            Text="{Binding ElementName=slider, Path=Value, Mode=TwoWay}" />
         <Slider
             Name="slider"
             Grid.Column="2"
             VerticalAlignment="Center"
             IsSnapToTickEnabled="True"
-            Maximum="{Binding ElementName=MySliderCtrl, Path=maximum}"
+            Maximum="0"
             SmallChange="0.1"
             TickFrequency="0.1"
-            Value="{Binding ElementName=MySliderCtrl, Path=value}" />
+            Value="{Binding ElementName=MySliderCtrl, Path=Value, Mode=TwoWay}" />
     </Grid>
 </UserControl>

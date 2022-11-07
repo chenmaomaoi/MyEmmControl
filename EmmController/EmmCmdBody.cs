@@ -9,7 +9,7 @@ namespace MyEmmControl
     /// <summary>
     /// 命令体所包含的信息
     /// </summary>
-    public class CommandBody
+    public class EmmCmdBody
     {
         /// <summary>
         /// 单字节，用于修改串口通信地址和细分步数。

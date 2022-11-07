@@ -13,7 +13,7 @@ using MyEmmControl.Communication;
 using SharpDX.Text;
 using Windows.Devices.Enumeration;
 
-namespace MyEmmControl.View
+namespace MyEmmControl.Views
 {
     /// <summary>
     /// SelectCommunicationMode_Window.xaml 的交互逻辑
@@ -49,7 +49,7 @@ namespace MyEmmControl.View
             bool res = communication.ConnectDeviceAndSettingWindow(this);
             if (res)
             {
-                App.MainWindow.controller = new EmmController(communication);
+                //App.MainWindow.controller = new EmmController(communication);
                 DialogResult = true;
                 this.Close();
             }

@@ -5,8 +5,13 @@ using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
+using CommunityToolkit.Mvvm.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using MyEmmControl.Communication;
-using MyEmmControl.View;
+using MyEmmControl.Views;
+using MyEmmControl.ViewModes;
 
 namespace MyEmmControl
 {
@@ -15,12 +20,44 @@ namespace MyEmmControl
     /// </summary>
     public partial class App : Application
     {
-        public new static MainWindow MainWindow;
+        public static IHost Host { get; private set; }
 
-        private void Application_Startup(object sender, StartupEventArgs e)
+        public App()
         {
-            MainWindow = new MainWindow();
-            MainWindow.Show();
+            Host = Microsoft.Extensions.Hosting.Host.CreateDefaultBuilder()
+                .ConfigureServices((context, services) =>
+                {
+                    ConfigureServices(services);
+                })
+                .ConfigureLogging((context, logging) =>
+                {
+                    logging.AddConfiguration(context.Configuration.GetSection("Logging"));
+                    logging.AddDebug();
+                    //logging.AddNLog();
+                })
+                .Build();
+        }
+
+        private void ConfigureServices(IServiceCollection services)
+        {
+            // Add Services
+            services.AddSingleton<MainWindow>();
+            services.AddSingleton<MainWindowViewMode>();
+        }
+
+        protected override async void OnStartup(StartupEventArgs e)
+        {
+            await Host.StartAsync();
+            var window = Host.Services.GetRequiredService<MainWindow>();
+            window.DataContext = Host.Services.GetRequiredService<MainWindowViewMode>();
+            window.Show();
+            base.OnStartup(e);
+        }
+
+        protected override async void OnExit(ExitEventArgs e)
+        {
+            await Host.StopAsync();
+            base.OnExit(e);
         }
     }
 }

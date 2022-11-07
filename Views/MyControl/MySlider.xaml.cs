@@ -1,28 +1,32 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
 
-namespace MyEmmControl.View.MyControl
+namespace MyEmmControl.Views.MyControl
 {
     /// <summary>
     /// MySlider.xaml 的交互逻辑
     /// </summary>
     public partial class MySlider : UserControl
     {
-        //根据模式返回具体的值
-        public double Value => IsRelativeMode ? (double)((double)AbsoluteMaximum / RelativeMaximum) * slider.Value
-                                              : slider.Value;
-
-        private double value
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <remarks>Get或Set都是绝对值</remarks>
+        public int Value
         {
-            get => (double)GetValue(valueProperty);
-            set => SetValue(valueProperty, value);
+            get
+            {
+                return IsRelativeMode ? (int)((double)AbsoluteMaximum / RelativeMaximum * (double)GetValue(ValueProperty))
+                                      : (int)(double)GetValue(ValueProperty);
+            }
+            set => SetValue(ValueProperty, value);
         }
-        public static readonly DependencyProperty valueProperty =
-            DependencyProperty.Register(nameof(value),
+
+        public static readonly DependencyProperty ValueProperty =
+            DependencyProperty.Register(nameof(Value),
                                         typeof(double),
                                         typeof(MySlider),
                                         new PropertyMetadata(default(double)));
-
 
 
         public bool IsRelativeMode
@@ -45,7 +49,7 @@ namespace MyEmmControl.View.MyControl
             DependencyProperty.Register(nameof(RelativeText),
                                         typeof(string),
                                         typeof(MySlider),
-                                        new PropertyMetadata(default(string)));
+                                        new PropertyMetadata("相对值"));
 
         public string AbsoluteText
         {
@@ -56,7 +60,7 @@ namespace MyEmmControl.View.MyControl
             DependencyProperty.Register(nameof(AbsoluteText),
                                         typeof(string),
                                         typeof(MySlider),
-                                        new PropertyMetadata(default(string)));
+                                        new PropertyMetadata("绝对值"));
 
         public int RelativeMaximum
         {
@@ -67,7 +71,7 @@ namespace MyEmmControl.View.MyControl
             DependencyProperty.Register(nameof(RelativeMaximum),
                                         typeof(int),
                                         typeof(MySlider),
-                                        new PropertyMetadata(default(int)));
+                                        new PropertyMetadata(100));
 
         public int AbsoluteMaximum
         {
@@ -78,31 +82,11 @@ namespace MyEmmControl.View.MyControl
             DependencyProperty.Register(nameof(AbsoluteMaximum),
                                         typeof(int),
                                         typeof(MySlider),
-                                        new PropertyMetadata(default(int)));
-
-        private int maximum
-        {
-            get => IsRelativeMode ? RelativeMaximum : AbsoluteMaximum;
-            set
-            {
-                if (IsRelativeMode)
-                {
-                    RelativeMaximum = value;
-                }
-                else
-                {
-                    AbsoluteMaximum = value;
-                }
-            }
-        }
+                                        new PropertyMetadata(200));
 
         public MySlider()
         {
             InitializeComponent();
-            RelativeText = "相对值";
-            RelativeMaximum = 100;
-            AbsoluteText = "绝对值";
-            AbsoluteMaximum = 300;
         }
 
         private void RadioButton_Checked(object sender, RoutedEventArgs e)
