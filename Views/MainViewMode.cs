@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -8,11 +10,13 @@ using System.Windows.Input;
 using CommunityToolkit.Mvvm;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Microsoft.Extensions.DependencyInjection;
 using MyEmmControl.Communication;
+using MyEmmControl.Views;
 
 namespace MyEmmControl.ViewModes
 {
-    public class MainWindowViewMode : ObservableObject
+    public class MainViewMode : ObservableObject
     {
         public EmmController Controller { get; set; }
 
@@ -20,7 +24,7 @@ namespace MyEmmControl.ViewModes
         /// 设备是否连接
         /// </summary>
         public bool IsConnected { get => _isConnected; set => SetProperty(ref _isConnected, value); }
-        private bool _isConnected = true;
+        private bool _isConnected = false;
 
         /// <summary>
         /// 是否为速度模式
@@ -52,19 +56,43 @@ namespace MyEmmControl.ViewModes
         public uint Puls { get => _puls; set => SetProperty(ref _puls, value); }
         private uint _puls = default;
 
-        public MainWindowViewMode()
+        public MainViewMode()
         {
-            Controller = new EmmController(new MyBLE());
-            ConnectDeviceCommand = new AsyncRelayCommand(ConnectDevice);
+            MainWindow = App.Host.Services.GetRequiredService<MainWindow>();
+
+            //初始化通信模式选项
+            var types = AppDomain.CurrentDomain.GetAssemblies()
+                .SelectMany(a => a.GetTypes().Where(t => t.BaseType == typeof(CommunicationBase)))
+                .Reverse();
+            foreach (Type type in types)
+            {
+                CommunicationTypes.Add(type.GetCustomAttribute<DescriptionAttribute>().Description, type);
+            }
+            //初始化Command
+            ConnectCommand = new RelayCommand<Type>(Connect);
         }
 
-        public ICommand ConnectDeviceCommand { get; }
+        private MainWindow MainWindow { get; }
 
-        public async Task ConnectDevice()
+        public ICommand SelectDeviceCommand { get; }
+
+        public Dictionary<string, Type> CommunicationTypes { get; private set; } = new Dictionary<string, Type>();
+
+        public ICommand ConnectCommand { get; }
+        private void Connect(Type args)
         {
-            await Task.Delay(10);
-            MessageBox.Show("点击了按钮");
-            return;
+            IsConnected = false;
+            ICommunication communication = (ICommunication)Activator.CreateInstance(args);
+            IsConnected = communication.ConnectDeviceAndSettingWindow(this.MainWindow);
+
+            if (IsConnected)
+            {
+                Controller = new EmmController(communication);
+            }
+            else
+            {
+                Controller = null;
+            }
         }
     }
 }

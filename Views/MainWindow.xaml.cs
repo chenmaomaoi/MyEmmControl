@@ -1,5 +1,7 @@
-﻿using MyEmmControl.Communication;
+﻿using Microsoft.Extensions.DependencyInjection;
+using MyEmmControl.Communication;
 using MyEmmControl.Extensions;
+using MyEmmControl.ViewModes;
 using SharpDX;
 using System;
 using System.Collections.Generic;
@@ -26,6 +28,19 @@ namespace MyEmmControl.Views
         public MainWindow()
         {
             InitializeComponent();
+        }
+
+        private void Window_Closed(object sender, EventArgs e)
+        {
+            Environment.Exit(0);
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            var window = App.Host.Services.GetRequiredService<SelectCommunicationMode_Window>();
+            window.Owner = this;
+            window.DataContext = this.DataContext;
+            window.ShowDialog();
         }
     }
 }

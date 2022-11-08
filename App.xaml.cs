@@ -42,14 +42,16 @@ namespace MyEmmControl
         {
             // Add Services
             services.AddSingleton<MainWindow>();
-            services.AddSingleton<MainWindowViewMode>();
+            services.AddSingleton<MainViewMode>();
+
+            services.AddTransient<SelectCommunicationMode_Window>();
         }
 
         protected override async void OnStartup(StartupEventArgs e)
         {
             await Host.StartAsync();
             var window = Host.Services.GetRequiredService<MainWindow>();
-            window.DataContext = Host.Services.GetRequiredService<MainWindowViewMode>();
+            window.DataContext = Host.Services.GetRequiredService<MainViewMode>();
             window.Show();
             base.OnStartup(e);
         }

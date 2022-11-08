@@ -21,19 +21,19 @@
             <ComboBox
                 Name="cbx_CommunicationType"
                 Grid.Row="1"
-                Margin="5" />
+                Margin="5"
+                DisplayMemberPath="Key"
+                ItemsSource="{Binding CommunicationTypes}"
+                SelectedIndex="0"
+                SelectedValuePath="Value" />
 
             <Grid Grid.Row="2">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition />
-                    <ColumnDefinition Width="Auto" />
-                </Grid.ColumnDefinitions>
-
                 <Button
-                    x:Name="btn_Ok"
-                    Grid.Column="1"
                     Margin="5"
-                    Click="btn_Ok_Click"
+                    HorizontalAlignment="Right"
+                    Click="Button_Click"
+                    Command="{Binding ConnectCommand}"
+                    CommandParameter="{Binding ElementName=cbx_CommunicationType, Path=SelectedValue}"
                     Content="确定" />
             </Grid>
 

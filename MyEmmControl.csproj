@@ -59,7 +59,6 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="ViewModes\SelectCommunicationViewMode.cs" />
     <Page Include="Communication\MyBLE\MyBLE_ConnectDeviceAndSettingWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -112,7 +111,7 @@
     <Compile Include="Views\MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="ViewModes\MainWindowViewMode.cs" />
+    <Compile Include="Views\MainViewMode.cs" />
     <Compile Include="Views\MyControl\MySlider.xaml.cs">
       <DependentUpon>MySlider.xaml</DependentUpon>
     </Compile>
