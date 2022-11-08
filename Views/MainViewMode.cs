@@ -84,15 +84,7 @@ namespace MyEmmControl.ViewModes
             IsConnected = false;
             ICommunication communication = (ICommunication)Activator.CreateInstance(args);
             IsConnected = communication.ConnectDeviceAndSettingWindow(this.MainWindow);
-
-            if (IsConnected)
-            {
-                Controller = new EmmController(communication);
-            }
-            else
-            {
-                Controller = null;
-            }
+            Controller = IsConnected ? new EmmController(communication) : null;
         }
     }
 }

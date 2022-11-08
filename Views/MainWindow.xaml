@@ -14,6 +14,9 @@
     WindowStartupLocation="CenterScreen"
     mc:Ignorable="d">
     <Grid Margin="5">
+        <Grid.Resources>
+            <local:StatesValueConverter x:Key="StatesValueConverter" />
+        </Grid.Resources>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
@@ -36,7 +39,21 @@
                 HorizontalAlignment="Center"
                 VerticalAlignment="Center"
                 SelectedIndex="0" />
-
+            <TextBlock
+                Margin="10,0,0,0"
+                VerticalAlignment="Center"
+                Text="{Binding IsConnected, Converter={StaticResource StatesValueConverter}, ConverterParameter=True}">
+                <TextBlock.Style>
+                    <Style TargetType="TextBlock">
+                        <Setter Property="Foreground" Value="Red" />
+                        <Style.Triggers>
+                            <Trigger Property="Text" Value="已连接">
+                                <Setter Property="Foreground" Value="Green" />
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </TextBlock.Style>
+            </TextBlock>
         </StackPanel>
 
         <Grid Grid.Row="1">
