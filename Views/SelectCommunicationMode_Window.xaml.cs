@@ -1,17 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Net.NetworkInformation;
-using System.Reflection;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
-using MyEmmControl.Extensions;
-using MyEmmControl.Communication;
-using SharpDX.Text;
-using Windows.Devices.Enumeration;
+﻿using System.Windows;
 
 namespace MyEmmControl.Views
 {

@@ -12,19 +12,21 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.DependencyInjection;
 using MyEmmControl.Communication;
+using MyEmmControl.Extensions;
 using MyEmmControl.Views;
 
 namespace MyEmmControl.ViewModes
 {
     public class MainViewMode : ObservableObject
     {
-        public EmmController Controller { get; set; }
+        public EmmController Controller { get => _controller; private set => SetProperty(ref _controller, value); }
+        private EmmController _controller;
 
         /// <summary>
         /// 设备是否连接
         /// </summary>
         public bool IsConnected { get => _isConnected; set => SetProperty(ref _isConnected, value); }
-        private bool _isConnected = false;
+        private bool _isConnected = true;
 
         /// <summary>
         /// 是否为速度模式
@@ -68,6 +70,12 @@ namespace MyEmmControl.ViewModes
             {
                 CommunicationTypes.Add(type.GetCustomAttribute<DescriptionAttribute>().Description, type);
             }
+            //初始化校验位选项
+            foreach (ChecksumTypes checksumType in Enum.GetValues(typeof(ChecksumTypes)))
+            {
+                DataChecksumTypes.Add(checksumType.GetFieldAttribute<DescriptionAttribute>().Description, checksumType);
+            }
+
             //初始化Command
             ConnectCommand = new RelayCommand<Type>(Connect);
         }
@@ -77,6 +85,7 @@ namespace MyEmmControl.ViewModes
         public ICommand SelectDeviceCommand { get; }
 
         public Dictionary<string, Type> CommunicationTypes { get; private set; } = new Dictionary<string, Type>();
+        public Dictionary<string, ChecksumTypes> DataChecksumTypes { get; private set; } = new Dictionary<string, ChecksumTypes>();
 
         public ICommand ConnectCommand { get; }
         private void Connect(Type args)

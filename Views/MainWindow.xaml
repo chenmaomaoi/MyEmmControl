@@ -8,11 +8,26 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:uc="clr-namespace:MyEmmControl.Views.MyControl"
     Title="MyEmmControl"
-    Width="550"
-    Height="340"
+    Width="670"
+    Height="380"
     Closed="Window_Closed"
     WindowStartupLocation="CenterScreen"
     mc:Ignorable="d">
+
+    <Window.Resources>
+        <Style x:Key="textBlockAlignRightStyle" TargetType="TextBlock">
+            <Setter Property="HorizontalAlignment" Value="Right" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="Margin" Value="2" />
+        </Style>
+
+        <Style x:Key="btnAlignLeftStyle" TargetType="Button">
+            <Setter Property="HorizontalAlignment" Value="Left" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="Margin" Value="2" />
+        </Style>
+    </Window.Resources>
+
     <Grid Margin="5">
         <Grid.Resources>
             <local:StatesValueConverter x:Key="StatesValueConverter" />
@@ -26,21 +41,24 @@
         <StackPanel Grid.Row="0" Orientation="Horizontal">
             <Button
                 Margin="5"
-                HorizontalAlignment="Left"
-                VerticalAlignment="Top"
                 Click="Button_Click"
                 Command="{Binding SelectDeviceCommand}"
-                Content="连接设备" />
+                Content="连接设备"
+                Style="{StaticResource btnAlignLeftStyle}" />
             <TextBlock
                 Margin="10,0,0,0"
                 VerticalAlignment="Center"
                 Text="校验位：" />
             <ComboBox
-                HorizontalAlignment="Center"
+                HorizontalAlignment="Left"
                 VerticalAlignment="Center"
-                SelectedIndex="0" />
+                DisplayMemberPath="Key"
+                ItemsSource="{Binding DataChecksumTypes}"
+                SelectedIndex="0"
+                SelectedValuePath="Value" />
             <TextBlock
                 Margin="10,0,0,0"
+                HorizontalAlignment="Left"
                 VerticalAlignment="Center"
                 Text="{Binding IsConnected, Converter={StaticResource StatesValueConverter}, ConverterParameter=True}">
                 <TextBlock.Style>
@@ -65,18 +83,195 @@
             <GroupBox
                 Grid.Column="0"
                 Margin="5"
-                Header="设备信息"
+                Header="设备参数"
                 IsEnabled="{Binding IsConnected}">
                 <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" MinWidth="20" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
-                        <RowDefinition Height="1*" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
                     <Button
                         Grid.Row="0"
-                        HorizontalAlignment="Left"
-                        VerticalAlignment="Top"
-                        Content="校准" />
+                        Grid.Column="2"
+                        Margin="2"
+                        Content="校准编码器"
+                        Style="{StaticResource btnAlignLeftStyle}" />
+
+                    <!--  编码器值  -->
+                    <TextBlock
+                        Grid.Row="2"
+                        Grid.Column="0"
+                        Style="{StaticResource textBlockAlignRightStyle}"
+                        Text="编码器值：" />
+                    <TextBox
+                        Grid.Row="2"
+                        Grid.Column="1"
+                        VerticalAlignment="Center"
+                        Text="{Binding Controller.EncoderValue, Mode=OneWay}" />
+                    <Button
+                        Grid.Row="2"
+                        Grid.Column="2"
+                        Content="读取"
+                        Style="{StaticResource btnAlignLeftStyle}" />
+
+                    <!--  脉冲数  -->
+                    <TextBlock
+                        Grid.Row="3"
+                        Grid.Column="0"
+                        Style="{StaticResource textBlockAlignRightStyle}"
+                        Text="脉冲数：" />
+                    <TextBox
+                        Grid.Row="3"
+                        Grid.Column="1"
+                        VerticalAlignment="Center"
+                        Text="{Binding Controller.PulsCount, Mode=OneWay}" />
+                    <Button
+                        Grid.Row="3"
+                        Grid.Column="2"
+                        Content="读取"
+                        Style="{StaticResource btnAlignLeftStyle}" />
+
+                    <!--  电机实时位置  -->
+                    <TextBlock
+                        Grid.Row="4"
+                        Grid.Column="0"
+                        Style="{StaticResource textBlockAlignRightStyle}"
+                        Text="电机实时位置：" />
+                    <TextBox
+                        Grid.Row="4"
+                        Grid.Column="1"
+                        VerticalAlignment="Center"
+                        Text="{Binding Controller.MotorPosition, Mode=OneWay}" />
+                    <StackPanel
+                        Grid.Row="4"
+                        Grid.Column="2"
+                        Orientation="Horizontal">
+                        <Button Content="读取" Style="{StaticResource btnAlignLeftStyle}" />
+                        <Button Content="设为零点" Style="{StaticResource btnAlignLeftStyle}" />
+                    </StackPanel>
+
+
+                    <!--  位置误差  -->
+                    <TextBlock
+                        Grid.Row="5"
+                        Grid.Column="0"
+                        Style="{StaticResource textBlockAlignRightStyle}"
+                        Text="位置误差：" />
+                    <TextBox
+                        Grid.Row="5"
+                        Grid.Column="1"
+                        VerticalAlignment="Center"
+                        Text="{Binding Controller.PositionError, Mode=OneWay}" />
+                    <Button
+                        Grid.Row="5"
+                        Grid.Column="2"
+                        Content="读取"
+                        Style="{StaticResource btnAlignLeftStyle}" />
+
+                    <!--  驱动板使能状态  -->
+                    <TextBlock
+                        Grid.Row="6"
+                        Grid.Column="0"
+                        Style="{StaticResource textBlockAlignRightStyle}"
+                        Text="驱动板使能状态：" />
+                    <TextBox
+                        Grid.Row="6"
+                        Grid.Column="1"
+                        VerticalAlignment="Center"
+                        Text="{Binding Controller.BoardIsEnable, Mode=OneWay}" />
+                    <StackPanel
+                        Grid.Row="6"
+                        Grid.Column="2"
+                        Orientation="Horizontal">
+                        <Button Content="读取" Style="{StaticResource btnAlignLeftStyle}" />
+                        <Button Content="使能" Style="{StaticResource btnAlignLeftStyle}" />
+                        <Button Content="关闭" Style="{StaticResource btnAlignLeftStyle}" />
+                    </StackPanel>
+
+                    <!--  堵转状态  -->
+                    <TextBlock
+                        Grid.Row="7"
+                        Grid.Column="0"
+                        Style="{StaticResource textBlockAlignRightStyle}"
+                        Text="堵转状态：" />
+                    <TextBox
+                        Grid.Row="7"
+                        Grid.Column="1"
+                        VerticalAlignment="Center"
+                        Text="{Binding Controller.BlockageProtectionState, Mode=OneWay}" />
+                    <StackPanel
+                        Grid.Row="7"
+                        Grid.Column="2"
+                        Orientation="Horizontal">
+                        <Button Content="读取" Style="{StaticResource btnAlignLeftStyle}" />
+                        <Button Content="复位堵转保护" Style="{StaticResource btnAlignLeftStyle}" />
+                    </StackPanel>
+
+                    <!--  单圈上电回零状态  -->
+                    <TextBlock
+                        Grid.Row="8"
+                        Grid.Column="0"
+                        Style="{StaticResource textBlockAlignRightStyle}"
+                        Text="上电回零状态：" />
+                    <TextBox
+                        Grid.Row="8"
+                        Grid.Column="1"
+                        VerticalAlignment="Center"
+                        Text="{Binding Controller.InitiationState, Mode=OneWay}" />
+                    <Button
+                        Grid.Row="8"
+                        Grid.Column="2"
+                        Content="读取"
+                        Style="{StaticResource btnAlignLeftStyle}" />
+
+                    <!--  细分步数  -->
+                    <TextBlock
+                        Grid.Row="9"
+                        Grid.Column="0"
+                        Style="{StaticResource textBlockAlignRightStyle}"
+                        Text="细分步数：" />
+                    <TextBox
+                        Grid.Row="9"
+                        Grid.Column="1"
+                        VerticalAlignment="Center"
+                        Text="{Binding Controller.Subdivision, Mode=OneWay}" />
+                    <Button
+                        Grid.Row="9"
+                        Grid.Column="2"
+                        Content="设置"
+                        Style="{StaticResource btnAlignLeftStyle}" />
+
+                    <!--  通信地址  -->
+                    <TextBlock
+                        Grid.Row="10"
+                        Grid.Column="0"
+                        Style="{StaticResource textBlockAlignRightStyle}"
+                        Text="通信地址：" />
+                    <TextBox
+                        Grid.Row="10"
+                        Grid.Column="1"
+                        VerticalAlignment="Center"
+                        Text="{Binding Controller.UARTAddr, Mode=OneWay}" />
+                    <Button
+                        Grid.Row="10"
+                        Grid.Column="2"
+                        Content="设置"
+                        Style="{StaticResource btnAlignLeftStyle}" />
+
                 </Grid>
             </GroupBox>
             <!--  运动控制区  -->
@@ -102,8 +297,7 @@
                     <TextBlock
                         Grid.Row="0"
                         Grid.Column="0"
-                        HorizontalAlignment="Right"
-                        VerticalAlignment="Center"
+                        Style="{StaticResource textBlockAlignRightStyle}"
                         Text="运动模式：" />
                     <Grid
                         Grid.Row="0"
@@ -133,8 +327,7 @@
                     <TextBlock
                         Grid.Row="1"
                         Grid.Column="0"
-                        HorizontalAlignment="Right"
-                        VerticalAlignment="Center"
+                        Style="{StaticResource textBlockAlignRightStyle}"
                         Text="运动方向：" />
                     <Grid
                         Grid.Row="1"
@@ -164,8 +357,7 @@
                     <TextBlock
                         Grid.Row="2"
                         Grid.Column="0"
-                        HorizontalAlignment="Right"
-                        VerticalAlignment="Center"
+                        Style="{StaticResource textBlockAlignRightStyle}"
                         Text="速度：" />
                     <uc:MySlider
                         Grid.Row="2"
@@ -180,8 +372,7 @@
                     <TextBlock
                         Grid.Row="3"
                         Grid.Column="0"
-                        HorizontalAlignment="Right"
-                        VerticalAlignment="Center"
+                        Style="{StaticResource textBlockAlignRightStyle}"
                         Text="加速度：" />
                     <uc:MySlider
                         Grid.Row="3"
@@ -196,8 +387,7 @@
                     <TextBlock
                         Grid.Row="4"
                         Grid.Column="0"
-                        HorizontalAlignment="Right"
-                        VerticalAlignment="Center"
+                        Style="{StaticResource textBlockAlignRightStyle}"
                         Text="角度/脉冲：" />
                     <uc:MySlider
                         Grid.Row="4"
@@ -222,7 +412,9 @@
 
         <!--  日志区  -->
         <Grid Grid.Row="2" Margin="5">
-            <TextBlock />
+            <GroupBox Header="日志">
+                <TextBlock />
+            </GroupBox>
         </Grid>
     </Grid>
 </Window>
