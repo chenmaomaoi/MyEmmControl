@@ -53,7 +53,7 @@ namespace MyEmmControl
             if (PulsTimes != null)
             {
                 //拼接脉冲数
-                result = result.Concat(BitConverter.GetBytes((UInt32)PulsTimes).Reverse());
+                result = result.Concat(BitConverter.GetBytes((uint)PulsTimes).Reverse().Skip(1));
             }
             return result.ToArray();
         }

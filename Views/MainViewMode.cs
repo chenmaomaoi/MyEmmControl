@@ -43,20 +43,17 @@ namespace MyEmmControl.ViewModes
         /// <summary>
         /// 速度
         /// </summary>
-        public ushort Speed { get => _speed; set => SetProperty(ref _speed, value); }
-        private ushort _speed = default;
+        public ushort Speed { get => (ushort)MainWindow.slider_Speed.Value; }
 
         /// <summary>
         /// 加速度
         /// </summary>
-        public byte Acceleration { get => _acceleration; set => SetProperty(ref _acceleration, value); }
-        private byte _acceleration = default;
+        public byte Acceleration { get => (byte)MainWindow.slider_Acceleration.Value; }
 
         /// <summary>
         /// 脉冲数
         /// </summary>
-        public uint Puls { get => _puls; set => SetProperty(ref _puls, value); }
-        private uint _puls = default;
+        public uint Puls { get => (uint)MainWindow.slider_Puls.Value; }
 
         public MainViewMode()
         {
@@ -78,6 +75,10 @@ namespace MyEmmControl.ViewModes
 
             //初始化Command
             ConnectCommand = new RelayCommand<Type>(Connect);
+            SendCommand = new RelayCommand<string>(Send);
+            SetSubdivisionCommand = new RelayCommand<string>(SetSubdivision);
+            SetUARTAddrCommand = new RelayCommand<string>(SetUARTAddr);
+            SetMotionCommand = new RelayCommand(SetMotion);
         }
 
         private MainWindow MainWindow { get; }
@@ -94,6 +95,60 @@ namespace MyEmmControl.ViewModes
             ICommunication communication = (ICommunication)Activator.CreateInstance(args);
             IsConnected = communication.ConnectDeviceAndSettingWindow(this.MainWindow);
             Controller = IsConnected ? new EmmController(communication) : null;
+        }
+
+        public ICommand SendCommand { get; }
+        private void Send(string cmdHeads)
+        {
+            if (IsConnected)
+            {
+                Controller.SendCommand((EmmCmdHeads)Enum.Parse(typeof(EmmCmdHeads), cmdHeads));
+            }
+        }
+
+        public ICommand SetSubdivisionCommand { get; }
+        private void SetSubdivision(string subdivision)
+        {
+            if (IsConnected)
+            {
+                Controller.SendCommand(EmmCmdHeads.UpdateSubdivision, new EmmCmdBody() { Data = Convert.ToByte(subdivision) });
+            }
+        }
+
+        public ICommand SetUARTAddrCommand { get; }
+        private void SetUARTAddr(string uartAddr)
+        {
+            if (IsConnected)
+            {
+                Controller.SendCommand(EmmCmdHeads.UpdateSubdivision, new EmmCmdBody() { Data = Convert.ToByte(uartAddr) });
+            }
+        }
+
+        public ICommand SetMotionCommand { get; }
+        private void SetMotion()
+        {
+            if (!IsConnected) return;
+            if (IsSpeedMode)
+            {
+                Controller.SendCommand(EmmCmdHeads.SetRotation,
+                                       new EmmCmdBody()
+                                       {
+                                           Direction = this.IsClockwiseRotation? DirectionOfRotation.CW : DirectionOfRotation.CCW,
+                                           Speed = this.Speed,
+                                           Acceleration= this.Acceleration
+                                       });
+            }
+            else
+            {
+                Controller.SendCommand(EmmCmdHeads.SetPosition,
+                                       new EmmCmdBody()
+                                       {
+                                           Direction = this.IsClockwiseRotation ? DirectionOfRotation.CW : DirectionOfRotation.CCW,
+                                           Speed = this.Speed,
+                                           Acceleration = this.Acceleration,
+                                           PulsTimes = this.Puls
+                                       });
+            }
         }
     }
 }

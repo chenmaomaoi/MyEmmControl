@@ -12,6 +12,7 @@ using Microsoft.Extensions.Logging;
 using MyEmmControl.Communication;
 using MyEmmControl.Views;
 using MyEmmControl.ViewModes;
+using System.Windows.Threading;
 
 namespace MyEmmControl
 {
@@ -49,11 +50,34 @@ namespace MyEmmControl
 
         protected override async void OnStartup(StartupEventArgs e)
         {
+            //UI线程未捕获异常处理事件
+            DispatcherUnhandledException += App_DispatcherUnhandledException;
+            //Task线程内未捕获异常处理事件
+            TaskScheduler.UnobservedTaskException += TaskScheduler_UnobservedTaskException;
+            //非UI线程未捕获异常处理事件
+            AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
+
+
             await Host.StartAsync();
             var window = Host.Services.GetRequiredService<MainWindow>();
             window.DataContext = Host.Services.GetRequiredService<MainViewMode>();
             window.Show();
             base.OnStartup(e);
+        }
+
+        private void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
+        {
+            //throw new NotImplementedException();
+        }
+
+        private void TaskScheduler_UnobservedTaskException(object sender, UnobservedTaskExceptionEventArgs e)
+        {
+            //throw new NotImplementedException();
+        }
+
+        private void App_DispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
+        {
+            //throw new NotImplementedException();
         }
 
         protected override async void OnExit(ExitEventArgs e)

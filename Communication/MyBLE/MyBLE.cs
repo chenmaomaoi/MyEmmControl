@@ -186,7 +186,7 @@ namespace MyEmmControl.Communication
             DateTime _sendTime = DateTime.Now;
             while (_data.Count <= 0)
             {
-                Thread.Sleep(1);
+                Thread.Sleep(0);
                 if (DateTime.Now.Subtract(_sendTime).TotalSeconds > 5)
                 {
                     throw new Exception("低功耗蓝牙设备未响应");
@@ -195,6 +195,7 @@ namespace MyEmmControl.Communication
 
             byte[] result = new byte[_data.Count];
             _data.CopyTo(result);
+            _data.Clear();
             getFlag = false;
             return result.ToArray();
         }

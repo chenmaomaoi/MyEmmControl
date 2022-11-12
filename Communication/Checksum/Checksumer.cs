@@ -60,7 +60,7 @@ namespace MyEmmControl.Communication
         private byte GetFixedChecksumValue(string checksumTypeStr)
         {
             string fixedStr = checksumTypeStr.Split('_')[1];
-            byte res = byte.Parse(fixedStr, NumberStyles.HexNumber);
+            byte res = Convert.ToByte(fixedStr,16);
             return res;
         }
 

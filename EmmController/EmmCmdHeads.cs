@@ -40,7 +40,7 @@ namespace MyEmmControl
         /// <remarks>无额外参数,返回编码器数值 uint16</remarks>
         [Description("读取编码器值")]
         [EmmCmd(new byte[] { 0x30 }, EmmCmdReturnValueTypes.UInt16, EmmCmdReturnOperationTypes.Value)]
-        ReadEncoderValue,
+        EncoderValue,
 
         /// <summary>
         /// 读取脉冲数
@@ -48,7 +48,7 @@ namespace MyEmmControl
         /// <remarks>无额外参数,返回脉冲数 int32</remarks>
         [Description("读取脉冲数")]
         [EmmCmd(new byte[] { 0x33 }, EmmCmdReturnValueTypes.Int32, EmmCmdReturnOperationTypes.Value)]
-        ReadPulsCount,
+        PulsCount,
 
         /// <summary>
         /// 读取电机实时位置
@@ -56,7 +56,7 @@ namespace MyEmmControl
         /// <remarks>无额外参数,返回电机位置 int32</remarks>
         [Description("读取电机实时位置")]
         [EmmCmd(new byte[] { 0x36 }, EmmCmdReturnValueTypes.Int32, EmmCmdReturnOperationTypes.Value)]
-        ReadMotorPosition,
+        MotorPosition,
 
         /// <summary>
         /// 读取位置误差
@@ -64,7 +64,7 @@ namespace MyEmmControl
         /// <remarks>无额外参数,返回位置误差 int16</remarks>
         [Description("读取位置误差")]
         [EmmCmd(new byte[] { 0x36 }, EmmCmdReturnValueTypes.Int16, EmmCmdReturnOperationTypes.Value)]
-        ReadPositionError,
+        PositionError,
 
         /// <summary>
         /// 读取驱动板使能状态
@@ -72,7 +72,7 @@ namespace MyEmmControl
         /// <remarks>无额外参数,返回状态信息 byte=>bool</remarks>
         [Description("读取驱动板使能状态")]
         [EmmCmd(new byte[] { 0x3A }, EmmCmdReturnValueTypes.State, EmmCmdReturnOperationTypes.Value)]
-        IsEnable,
+        BoardIsEnable,
 
         /// <summary>
         /// 读取堵转状态
@@ -84,7 +84,7 @@ namespace MyEmmControl
         /// </remarks>
         [Description("读取堵转状态")]
         [EmmCmd(new byte[] { 0x3E }, EmmCmdReturnValueTypes.State, EmmCmdReturnOperationTypes.Value)]
-        ReadBlockageProtectionState,
+        BlockageProtectionState,
 
         /// <summary>
         /// 读取单圈上电回零状态(失败为true)
@@ -96,7 +96,7 @@ namespace MyEmmControl
         /// </remarks>
         [Description("读取单圈上电回零状态")]
         [EmmCmd(new byte[] { 0x3A }, EmmCmdReturnValueTypes.State, EmmCmdReturnOperationTypes.Value)]
-        ReadInitiationState,
+        InitiationState,
         #endregion
 
         #region 修改参数命令

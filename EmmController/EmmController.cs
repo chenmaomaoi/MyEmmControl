@@ -25,21 +25,21 @@ namespace MyEmmControl
         /// <summary>
         /// 编码器值
         /// </summary>
-        [Description(nameof(EmmCmdHeads.ReadEncoderValue))]
+        [Description(nameof(EmmCmdHeads.EncoderValue))]
         public ushort EncoderValue { get => _encoderValue; private set => SetProperty(ref _encoderValue, value); }
         private ushort _encoderValue = default;
 
         /// <summary>
         /// 脉冲数
         /// </summary>
-        [Description(nameof(EmmCmdHeads.ReadPulsCount))]
+        [Description(nameof(EmmCmdHeads.PulsCount))]
         public int PulsCount { get => _pulsCount; private set => SetProperty(ref _pulsCount, value); }
         private int _pulsCount = default;
 
         /// <summary>
         /// 电机位置
         /// </summary>
-        [Description(nameof(EmmCmdHeads.ReadMotorPosition))]
+        [Description(nameof(EmmCmdHeads.MotorPosition))]
         public int MotorPosition
         {
             get => _motorPosition;
@@ -60,14 +60,14 @@ namespace MyEmmControl
         /// <summary>
         /// 位置误差
         /// </summary>
-        [Description(nameof(EmmCmdHeads.ReadPositionError))]
+        [Description(nameof(EmmCmdHeads.PositionError))]
         public short PositionError { get => _positionError; private set => SetProperty(ref _positionError, value); }
         private short _positionError = default;
 
         /// <summary>
         /// 堵转状态
         /// </summary>
-        [Description(nameof(EmmCmdHeads.ReadBlockageProtectionState))]
+        [Description(nameof(EmmCmdHeads.BlockageProtectionState))]
         public bool BlockageProtectionState
         {
             get => _blockageProtectionState;
@@ -78,7 +78,7 @@ namespace MyEmmControl
         /// <summary>
         /// 单圈上电回零状态
         /// </summary>
-        [Description(nameof(EmmCmdHeads.ReadInitiationState))]
+        [Description(nameof(EmmCmdHeads.InitiationState))]
         public bool InitiationState
         {
             get => _initiationState;
@@ -89,7 +89,7 @@ namespace MyEmmControl
         /// <summary>
         /// 驱动板状态
         /// </summary>
-        [Description(nameof(EmmCmdHeads.IsEnable))]
+        [Description(nameof(EmmCmdHeads.BoardIsEnable))]
         public bool BoardIsEnable { get => _boardIsEnable; private set => SetProperty(ref _boardIsEnable, value); }
         private bool _boardIsEnable = default;
 
@@ -124,7 +124,8 @@ namespace MyEmmControl
         /// <remarks>读取型指令没有指令体</remarks>
         private EmmCmdBody _emmCmdBody { get; set; }
 
-        public ICommunication Communication { get; set; }
+        public ICommunication Communication { get => _communication; private set => SetProperty(ref _communication, value); }
+        private ICommunication _communication;
 
         /// <summary>
         /// 位置运动模式结束-到达指定位置
@@ -187,7 +188,9 @@ namespace MyEmmControl
                        : new byte[] { UARTAddr }.Concat(head).Concat(_emmCmdBody.GetCommandBody()).ToArray();
 
             //发送命令并处理校验返回值，倒序
-            var uartMessgae = DataFilter(Communication.Get(_cmd)).Reverse().ToArray();
+            var result = Communication.Get(_cmd);
+
+            var uartMessgae = DataFilter(result.ToArray());
 
             //解析返回值
             var retValue = headattr.GetValue(uartMessgae);
@@ -196,26 +199,24 @@ namespace MyEmmControl
             switch (headattr.ReturnOperate)
             {
                 case EmmCmdReturnOperationTypes.Value:
-                    PropertyInfo propertyInfo = typeof(EmmController).GetProperty(_emmCmdHead.ToString());
-                    if (propertyInfo == null) throw new NotImplementedException(_emmCmdHead.ToString());
-                    propertyInfo.SetValue(this, retValue);
+                    PropertyInfo propertyInfo = this.GetType().GetProperty(_emmCmdHead.ToString());
+                    propertyInfo?.SetValue(this, retValue);
                     break;
                 case EmmCmdReturnOperationTypes.Other:
-                    MethodInfo methodInfo = typeof(EmmController).GetMethod(_emmCmdHead.ToString());
-                    if (methodInfo == null) throw new NotImplementedException(_emmCmdHead.ToString());
-                    methodInfo.Invoke(this, retValue);
+                    MethodInfo methodInfo = this.GetType().GetMethod(_emmCmdHead.ToString());
+                    methodInfo?.Invoke(this, new object[] { retValue });
                     break;
                 case EmmCmdReturnOperationTypes.No_Operation: break;
                 default: throw new ArgumentOutOfRangeException(nameof(headattr.ReturnOperate));
             }
-            return retValue;
+            return retValue.ToString();
         }
 
         /// <summary>
         /// 解除堵转保护
         /// </summary>
         /// <returns>接触堵转保护成功为true</returns>
-        private bool ResetBlockageProtection(bool e)
+        public bool ResetBlockageProtection(bool e)
         {
             if (e) this.BlockageProtectionState = false;
             return e;
@@ -224,7 +225,7 @@ namespace MyEmmControl
         /// <summary>
         /// 修改细分步数
         /// </summary>
-        private bool UpdateSubdivision(bool e)
+        public bool UpdateSubdivision(bool e)
         {
             if (e) this.Subdivision = (byte)_emmCmdBody.Data;
             return e;
@@ -233,7 +234,7 @@ namespace MyEmmControl
         /// <summary>
         /// 修改串口通讯地址
         /// </summary>
-        private bool UpdateUARTAddr(bool e)
+        public bool UpdateUARTAddr(bool e)
         {
             if (e) this.UARTAddr = (byte)_emmCmdBody.Data;
             return e;
@@ -242,12 +243,12 @@ namespace MyEmmControl
         /// <summary>
         /// 使能驱动板
         /// </summary>
-        private bool Enable(bool e)
+        public bool Enable(bool e)
         {
             if (e) this.BoardIsEnable = true;
             return e;
         }
-        private bool Disable(bool e)
+        public bool Disable(bool e)
         {
             if (e) this.BoardIsEnable = false;
             return e;
@@ -256,7 +257,7 @@ namespace MyEmmControl
         /// <summary>
         /// 控制电机转动
         /// </summary>
-        private bool SetRotation(bool e)
+        public bool SetRotation(bool e)
         {
             if (e) this.RotationCurrent = _emmCmdBody;
             return e;
@@ -265,7 +266,7 @@ namespace MyEmmControl
         /// <summary>
         /// 存储电机正反转参数
         /// </summary>
-        private bool StoreRotation(bool e)
+        public bool StoreRotation(bool e)
         {
             if (e) this.RotationMemory = this.RotationCurrent;
             return e;
@@ -274,7 +275,7 @@ namespace MyEmmControl
         /// <summary>
         /// 清除电机正反转参数
         /// </summary>
-        private bool RestoreRotation(bool e)
+        public bool RestoreRotation(bool e)
         {
             if (e) this.RotationMemory = null;
             return e;
