@@ -1,22 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using MyEmmControl.Communication;
-using MyEmmControl.Extensions;
-using MyEmmControl.ViewModes;
-using SharpDX;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 
 namespace MyEmmControl.Views
 {
@@ -25,9 +9,12 @@ namespace MyEmmControl.Views
     /// </summary>
     public partial class MainWindow : Window
     {
-        public MainWindow()
+        private readonly SelectCommunicationMode_Window Mode_Window;
+
+        public MainWindow(SelectCommunicationMode_Window mode_Window)
         {
             InitializeComponent();
+            Mode_Window = mode_Window;
         }
 
         private void Window_Closed(object sender, EventArgs e)
@@ -37,10 +24,9 @@ namespace MyEmmControl.Views
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            var window = App.Host.Services.GetRequiredService<SelectCommunicationMode_Window>();
-            window.Owner = this;
-            window.DataContext = this.DataContext;
-            window.ShowDialog();
+            Mode_Window.Owner = this;
+            Mode_Window.DataContext = this.DataContext;
+            Mode_Window.ShowDialog();
         }
     }
 }

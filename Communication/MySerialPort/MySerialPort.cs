@@ -21,7 +21,7 @@ namespace MyEmmControl.Communication
 
         private bool getFlag = false;
 
-        private List<byte> _data = new List<byte>();
+        private readonly List<byte> data = new List<byte>();
 
         public MySerialPort() : this(ChecksumTypes.None) { }
 
@@ -29,10 +29,10 @@ namespace MyEmmControl.Communication
         {
             this.serialPort = new SerialPort();
             this.ChecksumType = checksumType;
-            serialPort.DataReceived += serialPort_DataReceived;
+            serialPort.DataReceived += SerialPort_DataReceived;
         }
 
-        private void serialPort_DataReceived(object sender, SerialDataReceivedEventArgs e)
+        private void SerialPort_DataReceived(object sender, SerialDataReceivedEventArgs e)
         {
             byte[] result = new byte[serialPort.BytesToRead];
             serialPort.Read(result, 0, serialPort.BytesToRead);
@@ -47,15 +47,17 @@ namespace MyEmmControl.Communication
             }
             else
             {
-                _data.Clear();
-                _data.AddRange(result);
+                data.Clear();
+                data.AddRange(result);
             }
         }
 
         public override bool ConnectDeviceAndSettingWindow(Window owner)
         {
-            var dia = new MySerialPort_ConnectDeviceAndSettingWindow(this);
-            dia.Owner = owner;
+            var dia = new MySerialPort_ConnectDeviceAndSettingWindow(this)
+            {
+                Owner = owner
+            };
             return (bool)dia.ShowDialog();
         }
 
@@ -88,7 +90,7 @@ namespace MyEmmControl.Communication
             Send(data);
 
             DateTime _sendTime = DateTime.Now;
-            while (_data.Count <= 0)
+            while (this.data.Count <= 0)
             {
                 Thread.Sleep(1);
                 if (DateTime.Now.Subtract(_sendTime).TotalSeconds > 5)
@@ -97,8 +99,8 @@ namespace MyEmmControl.Communication
                 }
             }
 
-            byte[] result = new byte[_data.Count];
-            _data.CopyTo(result);
+            byte[] result = new byte[this.data.Count];
+            this.data.CopyTo(result);
             getFlag = false;
             return result.ToArray();
         }

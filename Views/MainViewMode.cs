@@ -11,6 +11,7 @@ using CommunityToolkit.Mvvm;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using MyEmmControl.Communication;
 using MyEmmControl.Extensions;
 using MyEmmControl.Views;
@@ -40,6 +41,8 @@ namespace MyEmmControl.ViewModes
         public bool IsClockwiseRotation { get => _isClockwiseRotation; set => SetProperty(ref _isClockwiseRotation, value); }
         private bool _isClockwiseRotation = true;
 
+        private readonly ILogger<MainViewMode> _logger;
+
         /// <summary>
         /// 速度
         /// </summary>
@@ -55,9 +58,12 @@ namespace MyEmmControl.ViewModes
         /// </summary>
         public uint Puls { get => (uint)MainWindow.slider_Puls.Value; }
 
-        public MainViewMode()
+        public MainViewMode(MainWindow mainWindow, ILogger<MainViewMode> logger)
         {
-            MainWindow = App.Host.Services.GetRequiredService<MainWindow>();
+            MainWindow = mainWindow;
+            MainWindow.DataContext = this;
+            _logger = logger;
+            _logger.LogInformation("1234");
 
             //初始化通信模式选项
             var types = AppDomain.CurrentDomain.GetAssemblies()
@@ -79,6 +85,8 @@ namespace MyEmmControl.ViewModes
             SetSubdivisionCommand = new RelayCommand<string>(SetSubdivision);
             SetUARTAddrCommand = new RelayCommand<string>(SetUARTAddr);
             SetMotionCommand = new RelayCommand(SetMotion);
+
+            this.MainWindow.Show();
         }
 
         private MainWindow MainWindow { get; }
@@ -133,9 +141,9 @@ namespace MyEmmControl.ViewModes
                 Controller.SendCommand(EmmCmdHeads.SetRotation,
                                        new EmmCmdBody()
                                        {
-                                           Direction = this.IsClockwiseRotation? DirectionOfRotation.CW : DirectionOfRotation.CCW,
+                                           Direction = this.IsClockwiseRotation ? DirectionOfRotation.CW : DirectionOfRotation.CCW,
                                            Speed = this.Speed,
-                                           Acceleration= this.Acceleration
+                                           Acceleration = this.Acceleration
                                        });
             }
             else

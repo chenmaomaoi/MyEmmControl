@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using System;
+using System.Windows;
 using System.Windows.Controls;
 
 namespace MyEmmControl.Views.MyControl
@@ -84,6 +85,8 @@ namespace MyEmmControl.Views.MyControl
                                         typeof(MySlider),
                                         new PropertyMetadata(200));
 
+        private double step => (double)AbsoluteMaximum / RelativeMaximum;
+
         public MySlider()
         {
             InitializeComponent();
@@ -95,7 +98,9 @@ namespace MyEmmControl.Views.MyControl
             {
                 slider.SmallChange = 0.1;
                 slider.TickFrequency = 0.1;
-                slider.Value = slider.Value / ((double)AbsoluteMaximum / RelativeMaximum);
+
+                //绝对值转引用
+                slider.Value = Math.Round(slider.Value / step, 1);
                 slider.Maximum = RelativeMaximum;
             }
             else
@@ -103,7 +108,9 @@ namespace MyEmmControl.Views.MyControl
                 slider.Maximum = AbsoluteMaximum;
                 slider.SmallChange = 1;
                 slider.TickFrequency = 1;
-                slider.Value = (int)((double)AbsoluteMaximum / RelativeMaximum * slider.Value);
+
+                //引用转绝对值
+                slider.Value = (int)(slider.Value * step);
             }
         }
     }
