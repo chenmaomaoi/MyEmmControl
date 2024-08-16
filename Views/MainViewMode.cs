@@ -27,7 +27,7 @@ namespace MyEmmControl.ViewModes
         /// 设备是否连接
         /// </summary>
         public bool IsConnected { get => _isConnected; set => SetProperty(ref _isConnected, value); }
-        private bool _isConnected = true;
+        private bool _isConnected = false;
 
         /// <summary>
         /// 是否为速度模式
