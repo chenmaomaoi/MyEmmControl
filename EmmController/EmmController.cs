@@ -1,9 +1,9 @@
-﻿using MyEmmControl.Extensions;
-using MyEmmControl.Communication;
-using System;
+﻿using System;
 using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
+using MyEmmControl.Communication;
+using MyEmmControl.Extensions;
 
 namespace MyEmmControl
 {
@@ -13,8 +13,9 @@ namespace MyEmmControl
         /// 通信地址
         /// </summary>
         /// <remarks>
-        /// 0为广播地址<para/>
-        /// 1-247为设备地址<para/>
+        /// 0为广播地址
+        /// <para/>
+        /// 1-247为设备地址
         /// </remarks>
         [Description(nameof(EmmCmdHeads.UpdateUARTAddr))]
         public byte UARTAddr { get; set; } = 0x01;
@@ -48,6 +49,8 @@ namespace MyEmmControl
         [Description(nameof(EmmCmdHeads.PositionError))]
         public short PositionError { get; private set; } = default;
 
+        //todo:位置误差换算
+
         /// <summary>
         /// 堵转状态
         /// </summary>
@@ -75,7 +78,11 @@ namespace MyEmmControl
         /// <summary>
         /// 保存的正反转参数
         /// </summary>
-        /// <remarks>方向，速度，加速度</remarks>
+        /// <remarks>
+        /// 方向，速度，加速度
+        /// <para/>
+        /// 仅保存速度模式；由于无法读取，此值需要保存到配置文件
+        /// </remarks>
         [Description(nameof(EmmCmdHeads.StoreRotation))]
         public EmmCmdBody RotationMemory { get; private set; }
 
@@ -93,10 +100,13 @@ namespace MyEmmControl
         /// <summary>
         /// 指令体
         /// </summary>
-        /// <remarks>读取型指令没有指令体</remarks>
+        /// <remarks> 读取型指令没有指令体 </remarks>
         private EmmCmdBody emmCmdBody { get; set; }
 
-        public ICommunication Communication { get; private set; }
+        /// <summary>
+        /// 通信中间件
+        /// </summary>
+        private ICommunication Communication { get; set; }
 
         /// <summary>
         /// 位置运动模式结束-到达指定位置
@@ -128,8 +138,8 @@ namespace MyEmmControl
         /// <summary>
         /// 数据处理：去除前缀地址
         /// </summary>
-        /// <param name="data"></param>
-        /// <returns></returns>
+        /// <param name="data"> </param>
+        /// <returns> </returns>
         private byte[] DataFilter(byte[] data)
         {
             //todo:AOP
@@ -144,12 +154,12 @@ namespace MyEmmControl
         /// <summary>
         /// 发送指令
         /// </summary>
-        /// <param name="emmCmdhead"></param>
-        /// <param name="emmCmdbody"></param>
+        /// <param name="emmCmdhead"> </param>
+        /// <param name="emmCmdbody"> </param>
         public string SendCommand(EmmCmdHeads emmCmdhead, EmmCmdBody emmCmdbody = null)
         {
-            emmCmdHead = emmCmdhead;
-            emmCmdBody = emmCmdbody;
+            this.emmCmdHead = emmCmdhead;
+            this.emmCmdBody = emmCmdbody;
 
             //取命令
             var headattr = emmCmdHead.GetFieldAttribute<EmmCmdAttribute>();
@@ -161,6 +171,7 @@ namespace MyEmmControl
                        : new byte[] { UARTAddr }.Concat(head).Concat(emmCmdBody.GetCommandBody()).ToArray();
 
             //发送命令并处理校验返回值，倒序
+            //todo:线程队列-=>生产者  发送信息=>消费者
             var result = Communication.Get(_cmd);
 
             var uartMessgae = DataFilter(result.ToArray());
@@ -175,10 +186,12 @@ namespace MyEmmControl
                     PropertyInfo propertyInfo = this.GetType().GetProperty(emmCmdHead.ToString());
                     propertyInfo?.SetValue(this, retValue);
                     break;
+
                 case EmmCmdReturnOperationTypes.Other:
                     MethodInfo methodInfo = this.GetType().GetMethod(emmCmdHead.ToString(), BindingFlags.NonPublic | BindingFlags.Instance);
                     methodInfo?.Invoke(this, new object[] { retValue });
                     break;
+
                 case EmmCmdReturnOperationTypes.No_Operation: break;
                 default: throw new ArgumentOutOfRangeException(nameof(headattr.ReturnOperate));
             }
@@ -188,7 +201,7 @@ namespace MyEmmControl
         /// <summary>
         /// 解除堵转保护
         /// </summary>
-        /// <returns>接触堵转保护成功为true</returns>
+        /// <returns> 接触堵转保护成功为true </returns>
         private bool ResetBlockageProtection(bool e)
         {
             if (e) this.BlockageProtectionState = false;
@@ -221,6 +234,7 @@ namespace MyEmmControl
             if (e) this.BoardIsEnable = true;
             return e;
         }
+
         private bool Disable(bool e)
         {
             if (e) this.BoardIsEnable = false;

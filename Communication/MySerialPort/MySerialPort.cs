@@ -1,14 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.IO;
 using System.IO.Ports;
 using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Markup;
 
 namespace MyEmmControl.Communication
 {
@@ -23,7 +19,9 @@ namespace MyEmmControl.Communication
 
         private readonly List<byte> data = new List<byte>();
 
-        public MySerialPort() : this(ChecksumTypes.None) { }
+        public MySerialPort() : this(ChecksumTypes.None)
+        {
+        }
 
         public MySerialPort(ChecksumTypes checksumType) : base(checksumType)
         {
@@ -80,7 +78,7 @@ namespace MyEmmControl.Communication
             //发送字节数组
             //参数1：包含要写入端口的数据的字节数组。
             //参数2：参数中从零开始的字节偏移量，从此处开始将字节复制到端口。
-            //参数3：要写入的字节数。 
+            //参数3：要写入的字节数。
             serialPort.Write(sdata, 0, sdata.Length);
         }
 

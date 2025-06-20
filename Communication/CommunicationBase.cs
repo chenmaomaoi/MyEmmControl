@@ -1,8 +1,8 @@
-﻿using MyEmmControl.Communication.Checksum;
-using MyEmmControl.Extensions;
-using System;
+﻿using System;
 using System.Linq;
 using System.Windows;
+using MyEmmControl.Communication.Checksum;
+using MyEmmControl.Extensions;
 
 namespace MyEmmControl.Communication
 {
@@ -25,10 +25,10 @@ namespace MyEmmControl.Communication
         /// <summary>
         /// 校验并且去除校验数据
         /// </summary>
-        /// <param name="sdata"></param>
-        /// <param name="dataBody"></param>
-        /// <remarks>收到数据应先调用改方法校验并去除附加的校验数据</remarks>
-        /// <returns></returns>
+        /// <param name="sdata"> </param>
+        /// <param name="dataBody"> </param>
+        /// <remarks> 收到数据应先调用改方法校验并去除附加的校验数据 </remarks>
+        /// <returns> </returns>
         protected byte[] CheckData(byte[] sdata)
         {
             //校验数据
@@ -57,20 +57,19 @@ namespace MyEmmControl.Communication
         }
 
         /// <inheritdoc/>
-        /// <remarks>在调用之前应调用CheckData</remarks>
+        /// <remarks> 在调用之前应调用CheckData </remarks>
         public abstract event EventHandler<byte[]> OnRecvdData;
 
         public abstract bool ConnectDeviceAndSettingWindow(Window owner);
 
         public abstract void Dispose();
 
-        /// <remarks>拿到返回的数据之后，应在使用数据钱调用CheckData以去除校验信息</remarks>
+        /// <remarks> 拿到返回的数据之后，应在使用数据钱调用CheckData以去除校验信息 </remarks>
         /// <inheritdoc/>
         public abstract byte[] Get(byte[] data);
 
-        /// <remarks>在发送之前应在数据结尾添加校验</remarks>
+        /// <remarks> 在发送之前应在数据结尾添加校验 </remarks>
         /// <inheritdoc/>
         public abstract void Send(byte[] data);
-
     }
 }

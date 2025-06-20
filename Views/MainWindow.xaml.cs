@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using System;
+﻿using System;
 using System.Windows;
 
 namespace MyEmmControl.Views
@@ -9,12 +8,12 @@ namespace MyEmmControl.Views
     /// </summary>
     public partial class MainWindow : Window
     {
-        private readonly SelectCommunicationMode_Window Mode_Window;
+        //private readonly SelectCommunicationMode_Window Mode_Window;
 
-        public MainWindow(SelectCommunicationMode_Window mode_Window)
+        public MainWindow()
         {
             InitializeComponent();
-            Mode_Window = mode_Window;
+            //Mode_Window = mode_Window;
         }
 
         private void Window_Closed(object sender, EventArgs e)
@@ -24,8 +23,11 @@ namespace MyEmmControl.Views
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            Mode_Window.Owner = this;
-            Mode_Window.DataContext = this.DataContext;
+            SelectCommunicationMode_Window Mode_Window = new SelectCommunicationMode_Window
+            {
+                Owner = this,
+                DataContext = this.DataContext
+            };
             Mode_Window.ShowDialog();
         }
     }

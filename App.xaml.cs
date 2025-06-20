@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Threading;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using MyEmmControl.Views;
 using MyEmmControl.ViewModes;
-using System.Windows.Threading;
-using Microsoft.Extensions.Configuration;
+using MyEmmControl.Views;
 
 namespace MyEmmControl
 {
@@ -50,7 +50,7 @@ namespace MyEmmControl
         /// <summary>
         /// Add Services
         /// </summary>
-        /// <param name="services"></param>
+        /// <param name="services"> </param>
         private void ConfigureServices(IServiceCollection services)
         {
             services.AddSingleton<MainWindow>();
