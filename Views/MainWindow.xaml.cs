@@ -8,12 +8,9 @@ namespace MyEmmControl.Views
     /// </summary>
     public partial class MainWindow : Window
     {
-        //private readonly SelectCommunicationMode_Window Mode_Window;
-
         public MainWindow()
         {
             InitializeComponent();
-            //Mode_Window = mode_Window;
         }
 
         private void Window_Closed(object sender, EventArgs e)
